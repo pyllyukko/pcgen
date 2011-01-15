@@ -1,0 +1,652 @@
+#!/usr/bin/expect --
+################################################################################
+#
+# pcgen v0.3b for adom - by pyllyukko - 2002, 2005 & 2004 (not 2003=)
+# send all suggestions, typo & bug reports, criticism & everything else to
+# pyllyukko <at> maimed <d0t> org
+# (before you mail anything please notice that this script is on beta stage)
+################################################################################
+# set these variables below as desired. pcgen will deside what to answer to the
+# opening questions based on these values. pcgen will try to get you more
+# (let's say) willpower if you put it to 10 or something. if the possibilities
+# on the question is to get +1 strength or +1 willpower, it will choose the
+# willpower.
+################################################################################
+# TODO:
+#   - force born with certain item?
+#   - force certain talents and amount of talents
+#   - force all stats above average...
+#   - own random system for race, class & sex
+#   - expect -ex
+#   - print inventory
+################################################################################
+array set wanted {strength 2 learning 2 willpower 2 dexterity 2 toughness 2 charisma 1 appearance 1 mana 2 perception 1}
+################################################################################
+#array set fave_talent {0 Healthy 1 Porter 2 Careful 3 Stealthy 4 Long-Lived}
+#array set fave_talent {0 Alert 1 Miser 2 "Treasure Hunter" 3 Stealthy 4 Long-Lived}
+#set fave_talents {Alert Miser "Treasure Hunter" Stealthy Long-Lived}
+#set fave_talents {Alert Miser "Treasure Hunter" Wealthy}
+#array set fave_talent {0 "Boon to the Family" 1 Charming 2 Heir 3 Stealthy 4 Long-Lived}
+################################################################################
+set timeout -1
+
+#array set pc {sex * race d profession f}
+#array set pc {sex * race d profession l}
+array set pc {sex * race * profession *}
+set pc(name) [exec date +%s]
+#set pc(name) esko
+
+set adom "/usr/local/games/adom/adom"
+# DO NOT TAMPER WITH THESE HERE BELOW!!!
+
+set log_user 0
+set force_month 0
+#set only_force_month 0
+set random_attributes 0
+set debug 0
+set re_roll_until 0
+array set done {0 1 1 1}
+set version "0.3b"
+set talents_on_one_page 0
+set avg_margin 2
+################################################################################
+### DATA
+set race_test {{10 12 10 10 10 10 10 10 10 2} {18 5 8 8 18 6 5 6 7 -9} {10 13 9 15 8 10 14 13 14 16} {10 13 10 14 7 8 18 15 14 19} {9 10 12 15 9 7 12 16 13 13} {12 11 11 9 13 9 9 10 11 5} {9 11 9 12 11 12 10 14 11 9} {6 10 10 15 12 12 10 8 10 3} {14 8 10 10 13 8 7 6 8 -6} {13 10 12 9 13 10 8 10 9 4}}
+set proff_test {{3 -2 1 0 1 0 0 -3 0 0} {2 1 2 -1 0 4 2 1 0 11} {2 -1 0 1 2 -1 0 0 3 6} {0 0 0 3 0 1 2 0 3 9} {1 1 0 2 1 -2 0 0 2 5} {-2 3 3 1 -1 2 0 3 1 10} {0 2 4 -1 0 1 0 3 0 9} {0 2 1 2 1 3 3 1 1 14} {2 1 3 2 1 -3 -1 -1 2 6} {-1 1 3 1 4 1 0 1 1 11} {2 -1 1 1 3 0 0 1 1 8} {1 0 0 4 0 0 1 0 3 9} {0 1 2 1 0 3 1 0 1 9} {2 -2 0 0 1 -1 -1 0 1 0} {-3 2 4 1 -1 0 0 1 1 5} {5 -2 2 1 3 -1 -1 -4 1 4} {0 1 0 0 2 0 0 2 1 6} {-1 2 2 0 1 -4 -3 3 0 0} {-1 2 1 1 0 -2 -1 2 0 2} {4 -1 -1 4 4 -2 -1 -2 2 7}}
+
+set races {human troll "high elf" "gray elf" "dark elf" dwarf gnome hurthling orc drakeling}
+set professions {fighter paladin ranger thief assassin wizard priest bard monk healer weaponsmith archer merchant farmer mindcrafter barbarian druid necromancer elementalist beastfighter}
+set attributes {strength learning willpower dexterity toughness charisma appearance mana perception}
+set starsigns {raven book wand unicorn salamander dragon sword falcon cup candle wolf tree}
+
+array set race_avg {a 2 b -9 c 16 d 19 e 13 f 5 g 9 h 3 i -6 j 4}
+array set prof_avg {a 0 b 11 c 6 d 9 e 5 f 10 g 9 h 14 i 6 j 11 k 8 l 9 m 9 n 0 o 5 p 4 q 6 r 0 s 2 t 7}
+set answers {1 -1 0 0 1 0 0 0 -1 1 0 -1 0 0 -1 0 0 1 0 1 0 0 0 -1 0 0 0 -1 1 1 0 0 -1 0 0 0 1 -1 1 0 1 -1 -1 0 0 0 1 0 0 0 -1 0 0 0 -1 1 1 0 -1 0 0 0 0 1 0 0 0 1 1 0 -2 0 1 -1 0 1 1 -1 0 -1 0 0 1 -1 1 0 -1 0 0 0 -1 0 0 -1 0 0 0 2 0 -1 0 0 0 -1 -1 0 1 2 1 0 0 0 0 0 0 0 -1 0 0 1 0 0 0 0 -1 0 -1 1 0 0 0 0 0 0 0 1 -1 0 0 1 -1 0 0 0 0 2 0 0 -1 -1 0 0 0 0 1 0 0 -1 -1 0 1 0 0 1 -1 1 0 -1 -1 0 1 0 0 0 0 0 0 0 0 0 0 1 1 0 -1 -1 0 0 0 0 -1 0 0 1 0 0 0 0 0 1 0 -1 0 1 0 0 -1 0 -1 0 1 0 0 0 0 0 0 2 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 1 -1 0 -1 0 1 0 0 0 0 0 0 0 1 1 -1 0 0 -1 0 0 -1 2 0 0 -1 0 0 0 0 0 -1 0 0 0 0 0 1 0 -1 -1 1 0 0 0 0 1 0 1 0 0 0 -1 0 0 0 0 -1 0 0 1 0 0 0 0 0 0 2 -1 -1 0 0 0 0 0 -1 -1 0 0 0 0 2 0 0 0 0 1 -1 0 0 0 0 0 1 0 -1 0 0 0 0 0 0 -2 2 0 1 0 -1 0 0 0 1 0 1 0 -2 0 0 0 0 1 -2 0 0 0 0 0 1 0 -1 2 0 0 -1 0 0 0 0 0 -1 0 0 -1 0 1 1 0 0 -1 1 0 -1 0 1 0 0 1 0 0 0 0 0 -1 0 0 -1 0 1 0 0 0 -1 1 0 -1 0 2 0 -1 0 0 0 1 0 0 -1 0 -1 0 0 1 0 0 1 0 0 0 0 -1 0 0 0 0 0 0 0 1 -1 0 0 1 0 0 -1 0 0 0 0 0 0 0 0 0 1 0 -1 0 0 -1 0 0 0 -1 0 1 1 0 1 -1 0 1 -1 0 0 0 0 0 -2 0 0 0 0 2 0 0 -1 1 0 -1 1 0 0 0 0 -2 0 1 0 0 0 1 0 0 -1 1 0 0 0 0 0 0 0 1 -1 0 0 0 0 -1 1 0 0 -1 1 0 -1 0 1 0 0 1 1 0 0 0 0 -2 0 0 1 -1 0 0 -1 0 1 0 0 -1 1 0 0 0 0 0 0 1 -1 1 0 1 0 0 -1 -1 0 -1 1 0 0 0 0 1 -1 0 -1 0 0 1 0 0 0 0 0 0 0 1 -1 0 0 0 0 0 0 0 0 0 1 0 -1 0 0 1 0 -1 0 0 0 0 0 0 0 0 1 1 -1 0 -1 0 1 -1 0 0 1 0 0 -1 0 -1 0 0 1 -1 0 0 1 0 1 0 0 -1 0 0 0 0 0 0 0 0 1 0 -1 0 0 0 0 -1 0 0 0 0 0 1 0 0 1 0 0 0 0 0 -1 0 0 -1 -1 0 0 0 0 2 0 -1 0 0 1 -1 0 0 0 1 -1 1 -2 1 1 -1 0 0 1 0 1 0 1 0 -2 0 -1 1 -1 0 1 0 0 0 0 0 0 0 0 1 0 0 1 0 -2 0 0 0 0 0 0 -1 0 1 0 0 0 -1 1 0 0 0 0 0 -1 1 -1 1 0 -1 0 0 1 0 0 0 -1 0 2 0 -1 0 0 1 -1 0 0 -1 0 1 0 0 0 -1 0 1 0 0 0 0 0 0 1 0 0 0 0 0 -1 -1 1 0 0 0 1 0 -1 0 -1 0 0 0 -1 0 0 2 0 -1 -1 0 1 0 0 0 1 0 0 0 0 0 0 0 0 -1 1 -1 0 0 0 -1 1 0 1 0 1 -1 0 0 1 -1 0 0 0 0 0 0 0 1 1 0 -1 -1 0 0 1 0 -1 0 0 0 0 0 1 0 0 -2 1 0 0 0 0 -1 1 1 -1 0 0 0 0 -1 0 -1 1 0 0 0 0 1 0 0 -1 0 1 0 0 -1 1 1 0 0 0 1 -1 0 -1 0 0 0 0 1 0 -1 0 0 0 0 0 1 0 0 -1 0 0 0 0 0 1 0 0 0 -2 1 0 1 0 1 -1 0 -1 0 0 0 0 1 -1 0 0 1 0 0 -1 0 -1 1 0 0 0 0 0 0 -1 0 0 1 0 1 0 0 -1 0 -1 0 0 0 1 0 1 -1 0 0 0 0 0 1 0 0 -1 1 0 0 1 0 -1 0 -1 0 1 0 0 0 1 0 0 -1 -1 0 0 -1 1 -1 0 0 0 1 1 -2 0 0 1 0 0 0 0 0 -1 0 0 0 1 0 1 -1 0 -1 0 0 0 0 0 1 0 0 0 -1 0 0 1 0 0 0 0 0 2 0 0 -1 0 -1 0 1 -1 0 0 1 -1 0 0 0 0 -1 0 1 0 0 0 0 0 0 0 -1 0 0 1 0 -1 1 0 0 2 0 0 -1 0 0 -1 0 1 0 0 0 -1 0 1 -1 0 0 1 0 0 0 0 0 -1 0 1 0 0 0 -1 0 0 0 0 0 -1 0 0 -1 0 2 0 0 0 1 0 0 0 0 -1 0 0 0 1 0 0 -1 0 0 0 0 0 -1 0 0 0 0 1 0 0 1 0 0 0 0 0 0 -1 0 0 0 0 -1 1 0 0 0 0 0 0 1 0 -1 0 0 0 0 1 0 0 0 0 0 0 -1 1 -1 0 1 0 0 0 -1 0 0 -1 0 -1 0 0 0 2 0 0 0 0 0 0 -1 0 1 0 1 0 0 -1 1 -1 0 0 0 0 1 0 1 0 0 0 -1 -1 0 1 0 0 0 0 0 -1 0 0 0 1 0 0 -1 0 0 0 1 -1 -1 0 1 0 0 0 0 1 1 0 0 -1 0 0 -1 0 1 0 0 0 1 -2 0 0 0 0 0 2 0 0 -2 0 0 0 1 -1 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 1 0 -1 0 0 1 0 0 0 0 0 0 0 0 0 0 1 0 -1 0 0 0 1 0 0 -1 0 0 0 0 0 0 0 0 -2 0 1 1 0 0 0 1 0 -1 0 0 0 0 0 0 -1 1 0 0 0 0 1 -1 1 -1 0 0 0 0 0 -1 1 0 0 0 0 0 0 0 0 -1 0 0 0 1 0 0 0 -1 0 0 0 -1 1 0 1 0 0 0 -1 1 0 0 0 0 0 0 1 0 0 0 0 0 -1 0 1 -1 0 0 0 0 0 0 0 0 -1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 -1 1 0 1 -1 0 0 0 0 0 0 0 0 0 0 0 -1 0 1 0 0 0 0 0 1 0 0 0 -1 1 0 0 -1 0 0 0 0 0 -1 1 0 0 0 0 0 0 0 0 0 0 -1 1 0 0 0 0 0 0 0 1 -1 0 0 0 0 0 0 0 -1 1 0 0 0 0 0 0 0 0 0 0 0 -1 1 0 1 0 0 0 0 0 -1 0 1 -1 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 1 0 0 -1 1 0 0 0 0 0 0 1 -1 0 0 0 0 0 0 0 0 0 1 -1 0 0 0 -1 1 1 -1 0 0 0 0 0 0 0 0 0 -1 1 0 0 0 0 0 1 0 0 0 1 -1 0 -1 0 -1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 -1 0 0 0 0 1 0 0 0 -1 0 0 0 1 0 0 0 0 -1 0 0 0 0 0 0 -1 0 1 0 0 -1 1 0 0 0 0 0 0 0 0 -1 0 0 0 0 1 0 1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 1 0 -1 1 0 0 0 0 0 0 0 0 1 0 1 -1 0 -1 0 0 0 1 0 0 -1 0 0 0 0 0 -1 1 0 -1 0 1 0 0 -1 0 0 0 1 0 1 -1 0 1 0 -1 0 0 0 0 0 0 -1 0 1 0 -1 0 1 0 0 0 -1 0 0 0 0 1 0 0 -1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 -1 0 1 -1 0 0 -1 0 1 0 0 1 0 0 0 0 0 -1 0 0 0 1 0 0 0 0 0 -1 0 0 1 0 0 0 0 -1 0 1 0 0 0 1 0 0 -2 0 0 1 0 0 0 0 0 -1 0}
+set alphabets {a b c d e f g h i j k l m n o p q r s t u v w x y}
+################################################################################
+proc kill_adom {pid} {
+  exec kill $pid
+  close
+  wait
+  file delete ~/.adom.data/.adom.prc
+  return 0
+}
+################################################################################
+proc ask_user {} {
+  global selected_talents
+  global talents
+  global done
+
+  global pid
+  
+  global race_avg
+  global prof_avg
+
+  global pc
+  global attributes
+
+  global total
+  
+  global month
+  global _sex
+  global _race
+  global _profession
+
+  global avg_margin
+  global races
+  global proff_test
+  global race_test
+  global professions
+  #global alphabets
+  global debug
+  
+  set ret 0
+
+  send_user "you are born in the month of the \033\[1;31m[string tolower $month]\033\[0m\n"
+  send_user "sex:\t\t\033\[1;31m${_sex}\033\[0m\n"
+  send_user "race:\t\t\033\[1;31m${_race}\033\[0m\n"
+  send_user "profession:\t\033\[1;31m${_profession}\033\[0m\n"
+
+  foreach attribute $attributes {
+    switch -- $attribute "mana" {send_user "$attribute:\t\t"} default {send_user "$attribute:\t"}
+    set testi [expr [lindex $race_test [lsearch $races "$_race"] [lsearch $attributes "$attribute"]] + [lindex $proff_test [lsearch $professions "$_profession"] [lsearch $attributes "$attribute"]]]
+
+    if {$pc($attribute)<[expr $testi - $avg_margin]} {send_user "\033\[0;31m"} else {if {$pc($attribute)>[expr $testi + $avg_margin]} {send_user "\033\[0;32m"} else {send_user "\033\[1;33m"}}
+    #if {$debug} {send_user "$pc($attribute)\033\[0m (average: \033\[1;31m$testi\033\[0m)\n"} else {send_user "$pc($attribute)\033\[0m\n"}
+    send_user "$pc($attribute)\033\[0m (average: \033\[1;31m$testi\033\[0m)\n"
+  }
+
+  if {$talents==1} {
+    send_user "talent: \033\[1;31m[string tolower [lindex $selected_talents 0]]\033\[0m\n"
+  } else {
+    send_user "talents: "
+    for {set x 0} {$x<[expr $talents - 1]} {incr x} {
+      if {$x==[expr $talents - 2]} {
+	send_user "\033\[1;31m[string tolower [lindex $selected_talents $x]]\033\[0m & \033\[1;31m[string tolower [lindex $selected_talents [expr $x + 1]]]\033\[0m\n"
+      } else {
+        send_user "\033\[1;31m[string tolower [lindex $selected_talents $x]]\033\[0m, "
+      }
+    }
+  }
+  #set avg [expr $total - (90 + $race_avg($pc(race)) + $prof_avg($pc(profession)))]
+  
+  #set avg [expr $total - 90 - $race_avg($pc(race)) - $prof_avg($pc(profession))]
+  set avg [expr $total - 90 - $race_avg($pc(cur_race)) - $prof_avg($pc(cur_profession))]
+  
+  #send_user "DEBUG: [lsearch $alphabets $pc(race)] [lindex $race_test [lsearch $alphabets "$pc(race)"] 9]\n"
+  #send_user "DEBUG: $pc(race) - $pc(profession)\n"
+  #if {$avg<1} {send_user "TOTAL: \033\[1;31m${total}\033\[0m (\033\[1;31m$avg\033\[0m)\n"} else {send_user "TOTAL: \033\[1;31m${total}\033\[0m (+\033\[1;31m$avg\033\[0m)\n"}
+  if {$avg<1} {send_user "TOTAL: \033\[1;31m${total}\033\[0m (\033\[1;31m[expr 90 + $race_avg($pc(cur_race)) + $prof_avg($pc(cur_profession))]\033\[0m/\033\[1;31m$avg\033\[0m)\n"} else {send_user "TOTAL: \033\[1;31m${total}\033\[0m (\033\[1;31m[expr 90 + $race_avg($pc(cur_race)) + $prof_avg($pc(cur_profession))]\033\[0m/+\033\[1;31m$avg\033\[0m)\n"}
+
+  send_user "press \033\[1;31mr\033\[0m to re-roll, \033\[1;31menter\033\[0m to play or \033\[1;31mq\033\[0m to quit\n"
+  stty raw
+  stty -echo
+  while {1} {
+    expect_user {
+      "\r" {
+	set ret 1
+	break
+      } "r" {
+        # AVERAGE + 40?
+        if {$total>160} {
+	  send_user "it's over \033\[1;31m160\033\[0m, are you sure? "
+	  expect_user {
+	    "y" {}
+	    "n" {set ret 1;break}
+	  }
+	}
+	kill_adom $pid
+	array set done {0 1 1 1}
+        send_user "\n"
+        break
+      } "q" {
+        kill_adom $pid
+	exit 0
+      }
+    }
+  }
+  stty -raw
+  stty echo
+  return $ret
+}
+################################################################################
+proc dealio {numero} {
+  global re_roll_until
+  global debug
+  global log_user
+
+  # ARRAYS
+  global wanted
+  global attributes
+  global answers
+
+  #array set number {strength 9 learning 8 willpower 7 dexterity 6 toughness 5 charisma 4 appearance 3 mana 2 perception 1}
+
+  if {$debug} {send_user "QUESTION: $numero\n"}
+  foreach choice "a b c d" {
+    switch -- $choice "a" {set i 27} "b" {set i 18} "c" {set i 9} "d" {set i 0}
+
+    #if {$debug} {send_user "  ANSWER: ${choice}\n"}
+    set available($choice,total) 0
+    foreach attribute $attributes {
+      set j [expr 9 - [lsearch $attributes $attribute]]
+      set available($choice,$attribute) [lindex $answers [expr $numero * 9 * 4 - $j - $i]]
+
+      #if {$debug&&$available($choice,$attribute)} {send_user "    $attribute: $available($choice,$attribute)\n"}
+
+      incr available($choice,total) [expr $wanted($attribute) * $available($choice,$attribute)]
+    }
+  }
+
+  expect "Your choice: "
+
+  if {$available(a,total)>$available(b,total)} {
+    if {$available(a,total)>$available(c,total)} {
+      if {$available(a,total)>$available(d,total)} {set greatest "a"} else {set greatest "d"}
+    } else {
+      if {$available(c,total)>$available(d,total)} {set greatest "c"} else {set greatest "d"}
+    }
+  } else {
+    if {$available(b,total)>$available(c,total)} {
+      if {$available(b,total)>$available(d,total)} {set greatest "b"} else {set greatest "d"}
+    } else {
+      if {$available(c,total)>$available(d,total)} {set greatest "c"} else {set greatest "d"}
+    }
+  }
+
+  if {$debug} {
+    send_user "  CHOOSING: $greatest / $available($greatest,total)\n"
+    foreach attribute $attributes {
+      if {$available($greatest,$attribute)} {send_user "    $attribute: $available($greatest,$attribute) / [expr $wanted($attribute) * $available($greatest,$attribute)]\n"}
+    }
+  }
+
+  send "$greatest"
+
+  if {!$log_user&&!$re_roll_until&&!$debug} {send_user "got question: \033\[1;31m${numero}\033\[0m, answering: \033\[1;31m${greatest}\033\[0m\n"}
+}
+# END-OF PROC DEALIO
+################################################################################
+exp_version -exit 5.41
+if {!$log_user} {send_user "pcgen v$version - by pyllyukko - 2002, 2004 & 2005\n\n"}
+if {![file executable $adom]} {send_error "error: \`$adom' not executable!\n";exit 1}
+if {![regexp "^\[a-j*]$" $pc(race)]} {
+  send_error "error: invalid race \"$race\"!\n"
+  exit 1
+}
+if {![regexp "^\[fm*]$" $pc(sex)]} {
+  send_error "error: invalid sex \"$sex\"!\n"
+  exit 1
+}
+if {![regexp "^\[a-t*]$" $pc(profession)]} {
+  send_error "error: invalid profession \"$profession\"\n"
+  exit 1
+}
+if {!$log_user} {log_user 0}
+if {[file exists ~/.adom.data/.adom.prc]} {file delete ~/.adom.data/.adom.prc}
+################################################################################
+### PARAMETERS
+if {$argc>0} {
+  for {set i 0} {$i<$argc} {incr i} {
+    set arg [lindex $argv $i]
+    switch -- $arg \
+    "-st" {
+      incr i
+      if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
+        send_error "NITWIT!\n"
+	exit 1
+      }
+      set wanted(strength) [lindex $argv $i]
+    } "-le" {
+      incr i
+      if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
+        send_error "NITWIT!\n"
+	exit 1
+      }
+      set wanted(learning) [lindex $argv $i]
+    } "-wi" {
+      incr i
+      if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
+        send_error "NITWIT!\n"
+	exit 1
+      }
+      set wanted(willpower) [lindex $argv $i]
+    } "-dx" {
+      incr i
+      if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
+        send_error "NITWIT!\n"
+	exit 1
+      }
+      set wanted(dexterity) [lindex $argv $i]    
+    } "-to" {
+      incr i
+      if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
+        send_error "NITWIT!\n"
+	exit 1
+      }
+      set wanted(toughness) [lindex $argv $i]    
+    } "-ch" {
+      incr i
+      if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
+        send_error "NITWIT!\n"
+	exit 1
+      }
+      set wanted(charisma) [lindex $argv $i]    
+    } "-ap" {
+      incr i
+      if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
+        send_error "NITWIT!\n"
+	exit 1
+      }
+      set wanted(appearance) [lindex $argv $i]    
+    } "-ma" {
+      incr i
+      if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
+        send_error "NITWIT!\n"
+	exit 1
+      }
+      set wanted(mana) [lindex $argv $i]    
+    } "-pe" {
+      incr i
+      if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
+        send_error "NITWIT!\n"
+	exit 1
+      }
+      set wanted(perception) [lindex $argv $i]
+    } "-h" {
+      send_user "  -st \[int]\t\twanted strength (default: $wanted(strength))\n  -le \[int]\t\twanted learning (default: $wanted(learning))\n  -wi \[int]\t\twanted willpower (default: $wanted(willpower))\n  -dx \[int]\t\twanted dexterity (default: $wanted(dexterity))\n  -to \[int]\t\twanted toughness (default: $wanted(toughness))\n  -ch \[int]\t\twanted charisma (default: $wanted(charisma))\n  -ap \[int]\t\twanted appearance (default: $wanted(appearance))\n  -ma \[int]\t\twanted mana (default: $wanted(mana))\n  -pe \[int]\t\twanted perception (default: $wanted(perception))\n\n  -r \[race]\t\trace\n  -p \[profession]\tprofession\n  -s \[sex]\t\tsex\n\n  -R\t\t\trandom attributes (don't take the pop quiz)\n  -f \[month]\t\tforce month \[month]\n  -rr \[int]\t\tre-roll until \[int] (be reasonable)\n  -d\t\t\tdebug mode\n  -h\t\t\tthis help\n"
+      exit 0
+    # INSERT RANDOM RACE, CLASS & SEX
+    } "-r" {
+      incr i
+      set j [lsearch $races [string tolower [lindex $argv $i]]]
+      if {$j==-1} {
+        send_error "error: invalid race: `[lindex $argv $i]'!\n"
+	exit 1
+      } else {
+	set pc(race) [lindex $alphabets $j]
+	set _race [string tolower [lindex $argv $i]]
+      }
+    } "-p" {
+      incr i
+      set j [lsearch $professions [string tolower [lindex $argv $i]]]
+      if {$j==-1} {
+        send_error "error: invalid profession: `[lindex $argv $i]'!\n"
+	exit 1
+      } else {
+	set pc(profession) [lindex $alphabets $j]
+	set _profession [string tolower [lindex $argv $i]]
+      }    
+    } "-s" {
+      incr i
+      switch -- [string tolower [lindex $argv $i]] "male" {
+        set pc(sex) "m"
+	set _sex "male"
+      } "female" {
+        set pc(sex) "f"
+	set _sex "female"
+      } default {
+        send_error "error: invalid sex: \`[lindex $argv $i]'!\n"
+	exit 1
+      }
+    } "-R" {
+      set random_attributes 1
+    } "-f" {
+      incr i
+      set force_month 1
+      set month_to_be_forced [string toupper [string range [lindex $argv $i] 0 0]][string tolower [string range [lindex $argv $i] 1 end]]
+      switch -- $month_to_be_forced "Raven" {} "Book" {} "Wand" {} "Unicorn" {} "Salamander" {} "Dragon" {} "Sword" {} "Falcon" {} "Cup" {} "Candle" {} "Wolf" {} "Tree" {} default {
+	send_error "error: invalid month to be forced: `[lindex $argv $i]'\n"
+        exit 1
+      }
+    } "-rr" {
+      incr i
+      set re_roll_until [lindex $argv $i]
+      if {![regexp "^\[0-9]*$" $re_roll_until]} {
+        send_error "NITWIT!\n"
+	exit 1
+      }
+    } "-d" {
+      set debug 1
+    } default {
+      send_error "error: `${arg}'? ...try `-h'!\n"
+      exit 1
+    }
+  }
+}
+################################################################################
+### SANITY CHECKS
+if {$re_roll_until&&$force_month} {
+  send_error "error: refusing to force stats AND month!\n"
+  exit 1
+}
+if {$pc(race)!="*"} {set pc(cur_race) $pc(race)}
+if {$pc(race)!="*"} {set pc(cur_profession) $pc(profession)}
+################################################################################
+if {$debug} {
+  global attributes
+  foreach attribute $attributes {send_user "wanted $attribute: $wanted($attribute)\n"}
+}
+################################################################################
+### MAIN
+while {1} {
+  if {$re_roll_until} {
+    if {$done(1)} {
+      send_user "rolling the dices"
+      set done(1) 0
+    }
+  }
+  ### FORCE MONTH LOOP
+  while {1} {
+    spawn $adom -m
+    set pid [exp_pid]
+    expect {
+      #"/* \r\n * ADOM session aborted due to an external problem. \r\n * Problem Description: ADOM is either already running or the file\r\n                        '/home/pyllyukko/.adom.data/.adom.prc' was not\r\n                        removed. \r\n                        Unable to start. \r\n */ \r\n\r\n\r\n[Press ENTER to continue]" {}
+      " \\* ADOM session aborted due to an external problem." {
+        if {!$log_user} {send_error "error! - change \$log_user to 1 to see what went wrong"}
+        expect "Press ENTER to continue]";send "\r";send_user "\n"
+        exit 1
+      }
+      "\\\[Press SPACE to continue]" {send " "}
+    }
+    expect {
+      "Your choice: " {}
+      "\\\[Press SPACE to continue]" {send " ";expect "\\\[Press SPACE to continue]";send " "}
+    }
+    send "g"
+    expect -re "You are born in the month of the (.*) on day "
+    set month $expect_out(1,string)
+    
+    # ASPECTS & GAME EFFECTS?
+    
+    if {$force_month} {
+      if {$done(0)} {
+	send_user "forcing month: \033\[1;31m[string tolower $month_to_be_forced]\033\[0m"
+        set done(0) 0
+      }
+      if {"$month"!="$month_to_be_forced"} {
+        kill_adom $pid
+      } else {break}
+      send_user "."
+    } else {break}
+  }
+  ### END-OF FORCE MONTH LOOP
+  if {$force_month} {send_user "\n"}
+  
+  expect "\\\[Press SPACE to continue]"
+  send " "
+  expect "\\\[f]ate decide? "
+  send "s"
+
+  expect "Your choice: "
+  send "$pc(sex)"
+
+  expect "Your choice: "
+  send "$pc(race)"
+
+  expect "Your choice: "
+  send "$pc(profession)"
+  
+  if {$pc(sex)=="*"||$pc(race)=="*"} {
+    expect -re "You are born to be a (\[^ ]*) (\[a-z ]*)\."
+    set _sex $expect_out(1,string)
+    set _race $expect_out(2,string)
+  }
+  # COMPLEXION?!?
+  if {$pc(profession)=="*"} {
+    expect {
+      #-re "You are now a fully.*learned( |\r\u001b\\\[\[0-9]*d)(\[a-z]*)\." {set _profession $expect_out(2,string)}
+      -re "You are now a fully.*learned( |.*\u001b\\\[\[0-9;]*\[dH])(\[a-z]*)\." {set _profession $expect_out(2,string)}
+      #-re "You are now a fully learned (\[a-z]*)\." {set _profession $expect_out(1,string)}
+      "you leave your tribe" {set _profession "barbarian"}
+    }
+  }
+  # RANDOMIZED?
+  # LSEARCH
+  if {$pc(race)=="*"} {switch -- $_race "human" {set pc(cur_race) "a"} "troll" {set pc(cur_race) "b"} "high elf" {set pc(cur_race) "c"} "gray elf" {set pc(cur_race) "d"} "dark elf" {set pc(cur_race) "e"} "dwarf" {set pc(cur_race) "f"} "gnome" {set pc(cur_race) "g"} "hurthling" {set pc(cur_race) "h"} "orc" {set pc(cur_race) "i"} "drakeling" {set pc(cur_race) "j"}}
+  if {$pc(profession)=="*"} {switch -- $_profession "fighter" {set pc(cur_profession) "a"} "paladin" {set pc(cur_profession) "b"} "ranger" {set pc(cur_profession) "c"} "thief" {set pc(cur_profession) "d"} "assassin" {set pc(cur_profession) "e"} "wizard" {set pc(cur_profession) "f"} "priest" {set pc(cur_profession) "g"} "bard" {set pc(cur_profession) "h"} "monk" {set pc(cur_profession) "i"} "healer" {set pc(cur_profession) "j"} "weaponsmith" {set pc(cur_profession) "k"} "archer" {set pc(cur_profession) "l"} "merchant" {set pc(cur_profession) "m"} "farmer" {set pc(cur_profession) "n"} "mindcrafter" {set pc(cur_profession) "o"} "barbarian" {set pc(cur_profession) "p"} "druid" {set pc(cur_profession) "q"} "necromancer" {set pc(cur_profession) "r"} "elementalist" {set pc(cur_profession) "s"} "beastfighter" {set pc(cur_profession) "t"}}
+  
+  expect "\\\[Press SPACE to continue]"
+  send " "
+  expect "\\\[q]uestions? "
+  if {!$random_attributes} {
+    send "q"
+    while {1} {
+      expect {
+        "Your father wants you to help him building"		{dealio 1}
+        "In your childhood slaves were forced to"			{dealio 2}
+        "You and your friends pass a lot of time"			{dealio 3}
+        "In cold winters lots of wood is needed to keep"		{dealio 4}
+        "Your grandfather always taught you to hone"		{dealio 5}
+        "When exploring a long-forgotten shed in the woods"		{dealio 6}
+        "You are offered two jobs on your first trip to the"	{dealio 7}
+        "Your favorite teacher discovers you trying to cheat on a"	{dealio 8}
+        "While crossing a ford on a well-known road you slip"	{dealio 9}
+        "You have been training with weapons for some time"		{dealio 10}
+        "At one point you fall deeply into love. Your beloved"	{dealio 11}
+        "While at a market, you discover a merchant"		{dealio 12}
+        "While playing in the fields during your childhood"		{dealio 13}
+        "Soon after starting your apprenticeship you come"		{dealio 14}
+        "After serving your master for several months, you"		{dealio 15}
+        "Having finally mastered the basics of your profession"	{dealio 16}
+        "The final day of your apprenticeship has come"		{dealio 17}
+        "After ending your apprenticeship you travel the country"	{dealio 18}
+        "Evil has started to invade the world, subtle and"		{dealio 19}
+        "Now that you are old enough, your parents gave you"	{dealio 20}
+        "As you make your way toward the chain of mountains"	{dealio 21}
+        "During your apprenticeship under an elderly wizard"	{dealio 22}
+        "While doing research in a library, you come across"	{dealio 23}
+        "During a night out, one of your friends is mugged and"	{dealio 24}
+        "While on a journey, your carriage is attacked by"		{dealio 25}
+        "If you came across an animal that was writhing in agony"	{dealio 26}
+        "Your brother has come asking that you hide him from"	{dealio 27}
+        "You are carrying your liege\'s gold to his castle"		{dealio 28}
+        "You have stolen to feed your family and the guards"	{dealio 29}
+        "Your king lies dying, the battle is lost. He asks"		{dealio 30}
+        "You are called home to run your late father\'s shop"	{dealio 31}
+        "You are a witness to a crime. You are called"		{dealio 32}
+        "As a child, whenever your friends had an idea"		{dealio 33}
+        "While shopping, you spot someone stealing something"	{dealio 34}
+        "One night you wake up of a strange dog whining"		{dealio 35}
+        "When your father took you hunting for the first time"	{dealio 36}
+        "What would you order in a restaurant for lunch"		{dealio 37}
+        "What about you gave your parents the most grief"		{dealio 38}
+        "Will you fight evil..."					{dealio 39}
+        "You are in a nobleman\'s house as a dinner guest. While"	{dealio 40}
+        "There have been whispers throughout the land of"		{dealio 41}
+        "Your mind made up, you pack your bags and prepare"		{dealio 42}
+        "On your way to the Drakalor Chain, you find"		{dealio 43}
+        "You attempt to make an arrow and you do not"		{dealio 44}
+        "You are walking on the street, when you see a gang"	{dealio 45}
+        "You are chopping wood at your cottage in the woods"	{dealio 46}
+        "You return back from your hunting trip and you notice"	{dealio 47}
+        "Your father has apprenticed you to the local smith. Do"	{dealio 48}
+        "You find yourself working as an apprentice to a wise"	{dealio 49}
+        "While learning tricks of the trade from your wise"		{dealio 50}
+        "After many years of toil, you have completed your"		{dealio 51}
+  ################################################################################
+        "Your choice: " {
+          send_error "UNINDENTIFIED QUESTION!!!\n"
+          sleep 5
+          send "a"
+        }
+	-re "Choose a talent \\(1 of (\[0-9])\\) -" {set talents $expect_out(1,string);break}
+      }
+    }
+  } else {
+    send "r"
+    expect -re "Choose a talent \\(1 of (\[0-9])\\) -"
+    set talents $expect_out(1,string)
+  }
+  # RANDOM-ATTRIB
+  if {!$log_user&&$force_month} {send_user "\n"}
+  ################################################################################
+  #system rm -f debug.log
+  ################################################################################
+  #array set fave_talent {0 Alert 1 Miser 2 "Treasure Hunter" 3 Stealthy 4 Long-Lived}
+  array set fave_talent {0 Alert 1 Miser 2 "Treasure Hunter"}
+  #array set fave_talent {0 Alert}
+  #array set fave_talent {0 Wealthy 1 Alert 2 Miser 3 "Treasure Hunter"}
+  #array set fave_talent {0 Alert 1 Charming 2 "Treasure Hunter"}
+  set selected_talents {}
+  #set talents_list {}
+  while {1} {
+    expect {
+      -re "(\[A-Y]) - (\[A-Za-z -]*)" {
+	lappend talents_list "[string trimright $expect_out(2,string)]"
+        #send_user "$expect_out(1,string) - [expr [llength $talents_list] - 1] - $expect_out(2,string)\n"
+      }
+      -re "\[^-]\r\u001b\\\[\[0-9]*d\\(more\\)" {
+        expect "\\\[?] Help"
+	send "+"
+	#send_user "+\n"
+	if {!$talents_on_one_page} {set talents_on_one_page [llength $talents_list]}
+      }
+      "\\\[?] Help" {
+        #send_user "AVAILABLE TALENTS: [llength $talents_list], PAGES: $page\n"
+	for {set i 0;set j -1;set k 0} {$i<[array size fave_talent]} {incr i;incr k} {
+	  if {$j==-1} {
+	    set j [lsearch $talents_list "$fave_talent($i)"]
+	  } else {
+	    if {$i==$k} {incr k -1}
+	    set fave_talent($k) $fave_talent($i)
+	  }
+	}
+	# FAVE TALENT FOUND?
+	if {$j!=-1} {
+	  array unset fave_talent [expr [array size fave_talent] - 1]
+	  #send_user "MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / [array size fave_talent] / talents-on-1-page: $talents_on_one_page\n"
+	}
+	if {$j!=-1} {
+	  #set talent($talents_selected) "[lindex $talents_list $j]"
+	  lappend selected_talents [lindex $talents_list $j]
+	  if {$j>[expr [llength $talents_list]-$talents_on_one_page]} {
+	    send "[lindex $alphabets [expr $j % $talents_on_one_page]]"
+	  } else {
+	    # TEMPORARY SOLUTION HERE!!!
+	    send "?"
+	    expect "\\\[Z] Exit"
+	    send "z"
+	    while {1} {
+	      expect {
+	        -re "(\[A-Y]) - [lindex $talents_list $j]" {
+		  expect "\\\[?] Help"
+		  send "$expect_out(1,string)"
+		  break
+		} "\\\[?] Help" {send -- "-"}
+	      }
+	    }
+	  }
+	} else {
+	  if {$re_roll_until} {send_user "x"} else {send_error "OUT OF FAVE TALENT!!!\n"}
+	  set random [expr {int(rand()*$talents_on_one_page)}]
+	  #send_user "random: $random - [lindex $alphabets $random] [expr [llength $talents_list] - $talents_on_one_page + $random] [lindex $talents_list [expr [llength $talents_list] - $talents_on_one_page + $random]]\n"
+
+	  send "[lindex $alphabets $random]"
+	  lappend selected_talents [lindex $talents_list [expr [llength $talents_list] - $talents_on_one_page + $random]]
+	}
+	set talents_list {}
+      }
+      # EO [?] Help
+      "What is your name? " {break}
+    }
+  }
+  # END-OF TALENT LOOP
+
+  send "$pc(name)\r"
+
+  # ALIGN?!
+  expect {
+    -re "St: *(\[0-9]*) *Le: *(\[0-9]*) *Wi: *(\[0-9]*) *Dx: *(\[0-9]*) *To: *(\[0-9]*) *Ch: *(\[0-9]*) *Ap: *(\[0-9]*) *Ma: *(\[0-9]*) *Pe: *(\[0-9]*)" {
+      set i 0
+      set total 0
+      foreach attribute $attributes {
+        incr i
+        set pc($attribute) $expect_out($i,string)
+        incr total $pc($attribute)
+      }          
+    }
+    "This name is already in use." {
+      kill_adom $pid
+      send_error "error: NAME ALREADY IN USE!\n"
+      exit 1
+    }
+  }
+
+  set game_screen $expect_out(buffer)
+
+  if {$re_roll_until} {
+    if {$total>$re_roll_until} {
+      send_user "\n"
+    } else {
+      send_user "."
+      kill_adom $pid
+      continue
+    }
+  }
+  if {[ask_user]} {break}
+}
+send_user "$game_screen"
+log_user 1
+
+interact
