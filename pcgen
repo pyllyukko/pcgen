@@ -36,9 +36,10 @@ array set pc {sex * race * profession *}
 set pc(name) [exec date +%s]
 #set pc(name) esko
 
-set adom "/usr/local/games/adom/adom"
+set adom "/usr/games/adom"
 # DO NOT TAMPER WITH THESE HERE BELOW!!!
 
+# we don't wan't to see the actual interaction between this script and ADOM
 set log_user 0
 set force_month 0
 #set only_force_month 0
@@ -78,7 +79,7 @@ proc ask_user {} {
   global done
 
   global pid
-  
+
   global race_avg
   global prof_avg
 
@@ -86,7 +87,7 @@ proc ask_user {} {
   global attributes
 
   global total
-  
+
   global month
   global _sex
   global _race
@@ -99,7 +100,7 @@ proc ask_user {} {
   global professions
   #global alphabets
   global debug
-  
+
   set ret 0
 
   send_user "you are born in the month of the \033\[1;31m[string tolower $month]\033\[0m\n"
@@ -129,10 +130,10 @@ proc ask_user {} {
     }
   }
   #set avg [expr $total - (90 + $race_avg($pc(race)) + $prof_avg($pc(profession)))]
-  
+
   #set avg [expr $total - 90 - $race_avg($pc(race)) - $prof_avg($pc(profession))]
   set avg [expr $total - 90 - $race_avg($pc(cur_race)) - $prof_avg($pc(cur_profession))]
-  
+
   #send_user "DEBUG: [lsearch $alphabets $pc(race)] [lindex $race_test [lsearch $alphabets "$pc(race)"] 9]\n"
   #send_user "DEBUG: $pc(race) - $pc(profession)\n"
   #if {$avg<1} {send_user "TOTAL: \033\[1;31m${total}\033\[0m (\033\[1;31m$avg\033\[0m)\n"} else {send_user "TOTAL: \033\[1;31m${total}\033\[0m (+\033\[1;31m$avg\033\[0m)\n"}
@@ -140,7 +141,10 @@ proc ask_user {} {
 
   send_user "press \033\[1;31mr\033\[0m to re-roll, \033\[1;31menter\033\[0m to play or \033\[1;31mq\033\[0m to quit\n"
   stty raw
-  stty -echo
+  # disable echoing
+  #stty -echo
+
+  # get user input
   while {1} {
     expect_user {
       "\r" {
@@ -155,7 +159,10 @@ proc ask_user {} {
 	    "n" {set ret 1;break}
 	  }
 	}
-	kill_adom $pid
+	send_user "DEBUG: before kill"
+	#kill_adom $pid
+	close
+	send_user "DEBUG: after kill"
 	array set done {0 1 1 1}
         send_user "\n"
         break
@@ -166,7 +173,11 @@ proc ask_user {} {
     }
   }
   stty -raw
-  stty echo
+  send_user "DEBUG: test1"
+
+  # the program crashes here? why?
+  #stty echo
+  send_user "DEBUG: test2"
   return $ret
 }
 ################################################################################
@@ -227,7 +238,10 @@ proc dealio {numero} {
 }
 # END-OF PROC DEALIO
 ################################################################################
+
+# make sure we have new enough version of expect
 exp_version -exit 5.41
+
 if {!$log_user} {send_user "pcgen v$version - by pyllyukko - 2002, 2004 & 2005\n\n"}
 if {![file executable $adom]} {send_error "error: \`$adom' not executable!\n";exit 1}
 if {![regexp "^\[a-j*]$" $pc(race)]} {
@@ -277,35 +291,35 @@ if {$argc>0} {
         send_error "NITWIT!\n"
 	exit 1
       }
-      set wanted(dexterity) [lindex $argv $i]    
+      set wanted(dexterity) [lindex $argv $i]
     } "-to" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
         send_error "NITWIT!\n"
 	exit 1
       }
-      set wanted(toughness) [lindex $argv $i]    
+      set wanted(toughness) [lindex $argv $i]
     } "-ch" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
         send_error "NITWIT!\n"
 	exit 1
       }
-      set wanted(charisma) [lindex $argv $i]    
+      set wanted(charisma) [lindex $argv $i]
     } "-ap" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
         send_error "NITWIT!\n"
 	exit 1
       }
-      set wanted(appearance) [lindex $argv $i]    
+      set wanted(appearance) [lindex $argv $i]
     } "-ma" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
         send_error "NITWIT!\n"
 	exit 1
       }
-      set wanted(mana) [lindex $argv $i]    
+      set wanted(mana) [lindex $argv $i]
     } "-pe" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
@@ -336,7 +350,7 @@ if {$argc>0} {
       } else {
 	set pc(profession) [lindex $alphabets $j]
 	set _profession [string tolower [lindex $argv $i]]
-      }    
+      }
     } "-s" {
       incr i
       switch -- [string tolower [lindex $argv $i]] "male" {
@@ -398,6 +412,7 @@ while {1} {
   }
   ### FORCE MONTH LOOP
   while {1} {
+    if {[file exists ~/.adom.data/.adom.prc]} {file delete ~/.adom.data/.adom.prc}
     spawn $adom -m
     set pid [exp_pid]
     expect {
@@ -407,18 +422,18 @@ while {1} {
         expect "Press ENTER to continue]";send "\r";send_user "\n"
         exit 1
       }
-      "\\\[Press SPACE to continue]" {send " "}
+      "Press SPACE to continue]" {send " "}
     }
     expect {
       "Your choice: " {}
-      "\\\[Press SPACE to continue]" {send " ";expect "\\\[Press SPACE to continue]";send " "}
+      "Press SPACE to continue]" {send " ";expect "Press SPACE to continue]";send " "}
     }
     send "g"
     expect -re "You are born in the month of the (.*) on day "
     set month $expect_out(1,string)
-    
+
     # ASPECTS & GAME EFFECTS?
-    
+
     if {$force_month} {
       if {$done(0)} {
 	send_user "forcing month: \033\[1;31m[string tolower $month_to_be_forced]\033\[0m"
@@ -432,8 +447,8 @@ while {1} {
   }
   ### END-OF FORCE MONTH LOOP
   if {$force_month} {send_user "\n"}
-  
-  expect "\\\[Press SPACE to continue]"
+
+  expect "Press SPACE to continue]"
   send " "
   expect "\\\[f]ate decide? "
   send "s"
@@ -446,7 +461,7 @@ while {1} {
 
   expect "Your choice: "
   send "$pc(profession)"
-  
+
   if {$pc(sex)=="*"||$pc(race)=="*"} {
     expect -re "You are born to be a (\[^ ]*) (\[a-z ]*)\."
     set _sex $expect_out(1,string)
@@ -454,19 +469,23 @@ while {1} {
   }
   # COMPLEXION?!?
   if {$pc(profession)=="*"} {
+    # TODO: this might need tweaking!
     expect {
       #-re "You are now a fully.*learned( |\r\u001b\\\[\[0-9]*d)(\[a-z]*)\." {set _profession $expect_out(2,string)}
       -re "You are now a fully.*learned( |.*\u001b\\\[\[0-9;]*\[dH])(\[a-z]*)\." {set _profession $expect_out(2,string)}
       #-re "You are now a fully learned (\[a-z]*)\." {set _profession $expect_out(1,string)}
       "you leave your tribe" {set _profession "barbarian"}
     }
+    #if {! $_profession}{
+    #  send_user "DEBUG: error detected"
+    #}
   }
   # RANDOMIZED?
   # LSEARCH
   if {$pc(race)=="*"} {switch -- $_race "human" {set pc(cur_race) "a"} "troll" {set pc(cur_race) "b"} "high elf" {set pc(cur_race) "c"} "gray elf" {set pc(cur_race) "d"} "dark elf" {set pc(cur_race) "e"} "dwarf" {set pc(cur_race) "f"} "gnome" {set pc(cur_race) "g"} "hurthling" {set pc(cur_race) "h"} "orc" {set pc(cur_race) "i"} "drakeling" {set pc(cur_race) "j"}}
   if {$pc(profession)=="*"} {switch -- $_profession "fighter" {set pc(cur_profession) "a"} "paladin" {set pc(cur_profession) "b"} "ranger" {set pc(cur_profession) "c"} "thief" {set pc(cur_profession) "d"} "assassin" {set pc(cur_profession) "e"} "wizard" {set pc(cur_profession) "f"} "priest" {set pc(cur_profession) "g"} "bard" {set pc(cur_profession) "h"} "monk" {set pc(cur_profession) "i"} "healer" {set pc(cur_profession) "j"} "weaponsmith" {set pc(cur_profession) "k"} "archer" {set pc(cur_profession) "l"} "merchant" {set pc(cur_profession) "m"} "farmer" {set pc(cur_profession) "n"} "mindcrafter" {set pc(cur_profession) "o"} "barbarian" {set pc(cur_profession) "p"} "druid" {set pc(cur_profession) "q"} "necromancer" {set pc(cur_profession) "r"} "elementalist" {set pc(cur_profession) "s"} "beastfighter" {set pc(cur_profession) "t"}}
-  
-  expect "\\\[Press SPACE to continue]"
+
+  expect "Press SPACE to continue]"
   send " "
   expect "\\\[q]uestions? "
   if {!$random_attributes} {
@@ -624,7 +643,7 @@ while {1} {
         incr i
         set pc($attribute) $expect_out($i,string)
         incr total $pc($attribute)
-      }          
+      }
     }
     "This name is already in use." {
       kill_adom $pid
