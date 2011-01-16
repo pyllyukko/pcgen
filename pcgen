@@ -159,10 +159,8 @@ proc ask_user {} {
 	    "n" {set ret 1;break}
 	  }
 	}
-	send_user "DEBUG: before kill"
 	#kill_adom $pid
 	close
-	send_user "DEBUG: after kill"
 	array set done {0 1 1 1}
         send_user "\n"
         break
@@ -173,15 +171,15 @@ proc ask_user {} {
     }
   }
   stty -raw
-  send_user "DEBUG: test1"
 
   # the program crashes here? why?
   #stty echo
-  send_user "DEBUG: test2"
   return $ret
 }
 ################################################################################
-proc dealio {numero} {
+proc answer_question {numero} {
+  # The opening question system: http://www.adomgb.info/adomgb-0-14.html#0.14.15
+
   global re_roll_until
   global debug
   global log_user
@@ -236,7 +234,7 @@ proc dealio {numero} {
 
   if {!$log_user&&!$re_roll_until&&!$debug} {send_user "got question: \033\[1;31m${numero}\033\[0m, answering: \033\[1;31m${greatest}\033\[0m\n"}
 }
-# END-OF PROC DEALIO
+# END-OF PROC ANSWER_QUESTION
 ################################################################################
 
 # make sure we have new enough version of expect
@@ -267,63 +265,63 @@ if {$argc>0} {
     "-st" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
-        send_error "NITWIT!\n"
+        send_error "error!\n"
 	exit 1
       }
       set wanted(strength) [lindex $argv $i]
     } "-le" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
-        send_error "NITWIT!\n"
+        send_error "error!\n"
 	exit 1
       }
       set wanted(learning) [lindex $argv $i]
     } "-wi" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
-        send_error "NITWIT!\n"
+        send_error "error!\n"
 	exit 1
       }
       set wanted(willpower) [lindex $argv $i]
     } "-dx" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
-        send_error "NITWIT!\n"
+        send_error "error!\n"
 	exit 1
       }
       set wanted(dexterity) [lindex $argv $i]
     } "-to" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
-        send_error "NITWIT!\n"
+        send_error "error!\n"
 	exit 1
       }
       set wanted(toughness) [lindex $argv $i]
     } "-ch" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
-        send_error "NITWIT!\n"
+        send_error "error!\n"
 	exit 1
       }
       set wanted(charisma) [lindex $argv $i]
     } "-ap" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
-        send_error "NITWIT!\n"
+        send_error "error!\n"
 	exit 1
       }
       set wanted(appearance) [lindex $argv $i]
     } "-ma" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
-        send_error "NITWIT!\n"
+        send_error "error!\n"
 	exit 1
       }
       set wanted(mana) [lindex $argv $i]
     } "-pe" {
       incr i
       if {![regexp "^\[0-9]*$" [lindex $argv $i]]} {
-        send_error "NITWIT!\n"
+        send_error "error!\n"
 	exit 1
       }
       set wanted(perception) [lindex $argv $i]
@@ -377,7 +375,7 @@ if {$argc>0} {
       incr i
       set re_roll_until [lindex $argv $i]
       if {![regexp "^\[0-9]*$" $re_roll_until]} {
-        send_error "NITWIT!\n"
+        send_error "error!\n"
 	exit 1
       }
     } "-d" {
@@ -412,7 +410,10 @@ while {1} {
   }
   ### FORCE MONTH LOOP
   while {1} {
+    # if the temporary file exists, ADOM refuses to start
     if {[file exists ~/.adom.data/.adom.prc]} {file delete ~/.adom.data/.adom.prc}
+
+    # spawn ADOM in monochrome mode
     spawn $adom -m
     set pid [exp_pid]
     expect {
@@ -453,12 +454,15 @@ while {1} {
   expect "\\\[f]ate decide? "
   send "s"
 
+  # choose sex
   expect "Your choice: "
   send "$pc(sex)"
 
+  # choose race
   expect "Your choice: "
   send "$pc(race)"
 
+  # choose profession
   expect "Your choice: "
   send "$pc(profession)"
 
@@ -476,9 +480,6 @@ while {1} {
       -re "You are now a fully learned (\[a-z]*)\." {set _profession $expect_out(1,string)}
       "you leave your tribe" {set _profession "barbarian"}
     }
-    #if {! $_profession}{
-    #  send_user "DEBUG: error detected"
-    #}
   }
   # RANDOMIZED?
   # LSEARCH
@@ -492,57 +493,57 @@ while {1} {
     send "q"
     while {1} {
       expect {
-        "Your father wants you to help him building"		{dealio 1}
-        "In your childhood slaves were forced to"			{dealio 2}
-        "You and your friends pass a lot of time"			{dealio 3}
-        "In cold winters lots of wood is needed to keep"		{dealio 4}
-        "Your grandfather always taught you to hone"		{dealio 5}
-        "When exploring a long-forgotten shed in the woods"		{dealio 6}
-        "You are offered two jobs on your first trip to the"	{dealio 7}
-        "Your favorite teacher discovers you trying to cheat on a"	{dealio 8}
-        "While crossing a ford on a well-known road you slip"	{dealio 9}
-        "You have been training with weapons for some time"		{dealio 10}
-        "At one point you fall deeply into love. Your beloved"	{dealio 11}
-        "While at a market, you discover a merchant"		{dealio 12}
-        "While playing in the fields during your childhood"		{dealio 13}
-        "Soon after starting your apprenticeship you come"		{dealio 14}
-        "After serving your master for several months, you"		{dealio 15}
-        "Having finally mastered the basics of your profession"	{dealio 16}
-        "The final day of your apprenticeship has come"		{dealio 17}
-        "After ending your apprenticeship you travel the country"	{dealio 18}
-        "Evil has started to invade the world, subtle and"		{dealio 19}
-        "Now that you are old enough, your parents gave you"	{dealio 20}
-        "As you make your way toward the chain of mountains"	{dealio 21}
-        "During your apprenticeship under an elderly wizard"	{dealio 22}
-        "While doing research in a library, you come across"	{dealio 23}
-        "During a night out, one of your friends is mugged and"	{dealio 24}
-        "While on a journey, your carriage is attacked by"		{dealio 25}
-        "If you came across an animal that was writhing in agony"	{dealio 26}
-        "Your brother has come asking that you hide him from"	{dealio 27}
-        "You are carrying your liege\'s gold to his castle"		{dealio 28}
-        "You have stolen to feed your family and the guards"	{dealio 29}
-        "Your king lies dying, the battle is lost. He asks"		{dealio 30}
-        "You are called home to run your late father\'s shop"	{dealio 31}
-        "You are a witness to a crime. You are called"		{dealio 32}
-        "As a child, whenever your friends had an idea"		{dealio 33}
-        "While shopping, you spot someone stealing something"	{dealio 34}
-        "One night you wake up of a strange dog whining"		{dealio 35}
-        "When your father took you hunting for the first time"	{dealio 36}
-        "What would you order in a restaurant for lunch"		{dealio 37}
-        "What about you gave your parents the most grief"		{dealio 38}
-        "Will you fight evil..."					{dealio 39}
-        "You are in a nobleman\'s house as a dinner guest. While"	{dealio 40}
-        "There have been whispers throughout the land of"		{dealio 41}
-        "Your mind made up, you pack your bags and prepare"		{dealio 42}
-        "On your way to the Drakalor Chain, you find"		{dealio 43}
-        "You attempt to make an arrow and you do not"		{dealio 44}
-        "You are walking on the street, when you see a gang"	{dealio 45}
-        "You are chopping wood at your cottage in the woods"	{dealio 46}
-        "You return back from your hunting trip and you notice"	{dealio 47}
-        "Your father has apprenticed you to the local smith. Do"	{dealio 48}
-        "You find yourself working as an apprentice to a wise"	{dealio 49}
-        "While learning tricks of the trade from your wise"		{dealio 50}
-        "After many years of toil, you have completed your"		{dealio 51}
+        "Your father wants you to help him building"		{answer_question 1}
+        "In your childhood slaves were forced to"			{answer_question 2}
+        "You and your friends pass a lot of time"			{answer_question 3}
+        "In cold winters lots of wood is needed to keep"		{answer_question 4}
+        "Your grandfather always taught you to hone"		{answer_question 5}
+        "When exploring a long-forgotten shed in the woods"		{answer_question 6}
+        "You are offered two jobs on your first trip to the"	{answer_question 7}
+        "Your favorite teacher discovers you trying to cheat on a"	{answer_question 8}
+        "While crossing a ford on a well-known road you slip"	{answer_question 9}
+        "You have been training with weapons for some time"		{answer_question 10}
+        "At one point you fall deeply into love. Your beloved"	{answer_question 11}
+        "While at a market, you discover a merchant"		{answer_question 12}
+        "While playing in the fields during your childhood"		{answer_question 13}
+        "Soon after starting your apprenticeship you come"		{answer_question 14}
+        "After serving your master for several months, you"		{answer_question 15}
+        "Having finally mastered the basics of your profession"	{answer_question 16}
+        "The final day of your apprenticeship has come"		{answer_question 17}
+        "After ending your apprenticeship you travel the country"	{answer_question 18}
+        "Evil has started to invade the world, subtle and"		{answer_question 19}
+        "Now that you are old enough, your parents gave you"	{answer_question 20}
+        "As you make your way toward the chain of mountains"	{answer_question 21}
+        "During your apprenticeship under an elderly wizard"	{answer_question 22}
+        "While doing research in a library, you come across"	{answer_question 23}
+        "During a night out, one of your friends is mugged and"	{answer_question 24}
+        "While on a journey, your carriage is attacked by"		{answer_question 25}
+        "If you came across an animal that was writhing in agony"	{answer_question 26}
+        "Your brother has come asking that you hide him from"	{answer_question 27}
+        "You are carrying your liege\'s gold to his castle"		{answer_question 28}
+        "You have stolen to feed your family and the guards"	{answer_question 29}
+        "Your king lies dying, the battle is lost. He asks"		{answer_question 30}
+        "You are called home to run your late father\'s shop"	{answer_question 31}
+        "You are a witness to a crime. You are called"		{answer_question 32}
+        "As a child, whenever your friends had an idea"		{answer_question 33}
+        "While shopping, you spot someone stealing something"	{answer_question 34}
+        "One night you wake up of a strange dog whining"		{answer_question 35}
+        "When your father took you hunting for the first time"	{answer_question 36}
+        "What would you order in a restaurant for lunch"		{answer_question 37}
+        "What about you gave your parents the most grief"		{answer_question 38}
+        "Will you fight evil..."					{answer_question 39}
+        "You are in a nobleman\'s house as a dinner guest. While"	{answer_question 40}
+        "There have been whispers throughout the land of"		{answer_question 41}
+        "Your mind made up, you pack your bags and prepare"		{answer_question 42}
+        "On your way to the Drakalor Chain, you find"		{answer_question 43}
+        "You attempt to make an arrow and you do not"		{answer_question 44}
+        "You are walking on the street, when you see a gang"	{answer_question 45}
+        "You are chopping wood at your cottage in the woods"	{answer_question 46}
+        "You return back from your hunting trip and you notice"	{answer_question 47}
+        "Your father has apprenticed you to the local smith. Do"	{answer_question 48}
+        "You find yourself working as an apprentice to a wise"	{answer_question 49}
+        "While learning tricks of the trade from your wise"		{answer_question 50}
+        "After many years of toil, you have completed your"		{answer_question 51}
   ################################################################################
         "Your choice: " {
           send_error "UNINDENTIFIED QUESTION!!!\n"
