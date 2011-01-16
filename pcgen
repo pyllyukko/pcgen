@@ -1,7 +1,7 @@
 #!/usr/bin/expect --
 ################################################################################
 #
-# pcgen v0.3b for adom - by pyllyukko - 2002, 2005 & 2004 (not 2003=)
+# pcgen v0.3.1b for adom - by pyllyukko - 2002, 2005 & 2004 (not 2003=)
 # send all suggestions, typo & bug reports, criticism & everything else to
 # pyllyukko <at> maimed <d0t> org
 # (before you mail anything please notice that this script is on beta stage)
@@ -34,7 +34,6 @@ set timeout -1
 #array set pc {sex * race d profession l}
 array set pc {sex * race * profession *}
 set pc(name) [exec date +%s]
-#set pc(name) esko
 
 set adom "/usr/games/adom"
 # DO NOT TAMPER WITH THESE HERE BELOW!!!
@@ -47,7 +46,7 @@ set random_attributes 0
 set debug 0
 set re_roll_until 0
 array set done {0 1 1 1}
-set version "0.3b"
+set version "0.3.1b"
 set talents_on_one_page 0
 set avg_margin 2
 ################################################################################
@@ -326,7 +325,7 @@ if {$argc>0} {
       }
       set wanted(perception) [lindex $argv $i]
     } "-h" {
-      send_user "  -st \[int]\t\twanted strength (default: $wanted(strength))\n  -le \[int]\t\twanted learning (default: $wanted(learning))\n  -wi \[int]\t\twanted willpower (default: $wanted(willpower))\n  -dx \[int]\t\twanted dexterity (default: $wanted(dexterity))\n  -to \[int]\t\twanted toughness (default: $wanted(toughness))\n  -ch \[int]\t\twanted charisma (default: $wanted(charisma))\n  -ap \[int]\t\twanted appearance (default: $wanted(appearance))\n  -ma \[int]\t\twanted mana (default: $wanted(mana))\n  -pe \[int]\t\twanted perception (default: $wanted(perception))\n\n  -r \[race]\t\trace\n  -p \[profession]\tprofession\n  -s \[sex]\t\tsex\n\n  -R\t\t\trandom attributes (don't take the pop quiz)\n  -f \[month]\t\tforce month \[month]\n  -rr \[int]\t\tre-roll until \[int] (be reasonable)\n  -d\t\t\tdebug mode\n  -h\t\t\tthis help\n"
+      send_user "  -st \[int]\t\twanted strength (default: $wanted(strength))\n  -le \[int]\t\twanted learning (default: $wanted(learning))\n  -wi \[int]\t\twanted willpower (default: $wanted(willpower))\n  -dx \[int]\t\twanted dexterity (default: $wanted(dexterity))\n  -to \[int]\t\twanted toughness (default: $wanted(toughness))\n  -ch \[int]\t\twanted charisma (default: $wanted(charisma))\n  -ap \[int]\t\twanted appearance (default: $wanted(appearance))\n  -ma \[int]\t\twanted mana (default: $wanted(mana))\n  -pe \[int]\t\twanted perception (default: $wanted(perception))\n\n  -r \[race]\t\trace\n  -p \[profession]\tprofession\n  -s \[sex]\t\tsex\n\n  -R\t\t\trandom attributes (don't take the pop quiz)\n  -f \[month]\t\tforce month \[month]\n  -rr \[int]\t\tre-roll until your stats sum is at least \[int] (be reasonable)\n  -d\t\t\tdebug mode\n  -h\t\t\tthis help\n"
       exit 0
     # INSERT RANDOM RACE, CLASS & SEX
     } "-r" {
@@ -475,9 +474,9 @@ while {1} {
   if {$pc(profession)=="*"} {
     # TODO: this might need tweaking!
     expect {
-      #-re "You are now a fully.*learned( |\r\u001b\\\[\[0-9]*d)(\[a-z]*)\." {set _profession $expect_out(2,string)}
+      -re "You are now a fully.*learned( |\r\u001b\\\[\[0-9]+d)(\[a-z]+)\." {set _profession $expect_out(2,string)}
       #-re "You are now a fully.*learned( |.*\u001b\\\[\[0-9;]*\[dH])(\[a-z]*)\." {set _profession $expect_out(2,string)}
-      -re "You are now a fully learned (\[a-z]*)\." {set _profession $expect_out(1,string)}
+      #-re "You are now a fully learned (\[a-z]*)\." {set _profession $expect_out(1,string)}
       "you leave your tribe" {set _profession "barbarian"}
     }
   }
