@@ -40,6 +40,8 @@ set adom "/usr/games/adom"
 
 # we don't wan't to see the actual interaction between this script and ADOM
 set log_user 0
+# debugging
+exp_internal 0
 set force_month 0
 #set only_force_month 0
 set random_attributes 0
