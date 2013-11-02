@@ -116,6 +116,7 @@ proc ask_user {} {
     send_user "$pc($attribute)\033\[0m (average: \033\[1;31m$testi\033\[0m)\n"
   }
 
+  # print the talents
   if {$talents==1} {
     send_user "talent: \033\[1;31m[string tolower [lindex $selected_talents 0]]\033\[0m\n"
   } else {
@@ -563,7 +564,7 @@ while {1} {
   #system rm -f debug.log
   ################################################################################
   #array set fave_talent {0 Alert 1 Miser 2 "Treasure Hunter" 3 Stealthy 4 Long-Lived}
-  array set fave_talent {0 Alert 1 Miser 2 "Treasure Hunter"}
+  array set fave_talent {0 "Good Learner" 1 Healthy 2 Learned 3 Careful 4 Alert 5 Miser 6 "Treasure Hunter"}
   #array set fave_talent {0 Alert}
   #array set fave_talent {0 Wealthy 1 Alert 2 Miser 3 "Treasure Hunter"}
   #array set fave_talent {0 Alert 1 Charming 2 "Treasure Hunter"}
