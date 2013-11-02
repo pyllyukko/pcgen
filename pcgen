@@ -234,7 +234,7 @@ proc answer_question {numero} {
 
   send "$greatest"
 
-  if {!$log_user&&!$re_roll_until&&!$debug} {send_user "got question: \033\[1;31m${numero}\033\[0m, answering: \033\[1;31m${greatest}\033\[0m\n"}
+  if {!$log_user&&!$re_roll_until&&!$debug} {send_user "got question: \033\[1;31m${numero}\033\[0m,\tanswering: \033\[1;31m${greatest}\033\[0m\n"}
 }
 # END-OF PROC ANSWER_QUESTION
 ################################################################################
