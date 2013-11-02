@@ -418,6 +418,11 @@ while {1} {
     # spawn ADOM in monochrome mode
     spawn $adom -m
     set pid [exp_pid]
+
+    # prerelease notice
+    expect "PRESS ENTER TO CONTINUE]"
+    send "\r"
+
     expect {
       #"/* \r\n * ADOM session aborted due to an external problem. \r\n * Problem Description: ADOM is either already running or the file\r\n                        '/home/pyllyukko/.adom.data/.adom.prc' was not\r\n                        removed. \r\n                        Unable to start. \r\n */ \r\n\r\n\r\n[Press ENTER to continue]" {}
       " \\* ADOM session aborted due to an external problem." {
