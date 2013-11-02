@@ -564,75 +564,167 @@ while {1} {
   #system rm -f debug.log
   ################################################################################
   #array set fave_talent {0 Alert 1 Miser 2 "Treasure Hunter" 3 Stealthy 4 Long-Lived}
-  array set fave_talent {0 "Good Learner" 1 Healthy 2 Learned 3 Careful 4 Alert 5 Miser 6 "Treasure Hunter"}
+  array set fave_talent {0 "Good Learner" 1 Healthy 2 Learned 3 Careful 4 Alert 5 Miser 6 "Treasure Hunter" 7 Tough 8 Wealthy}
   #array set fave_talent {0 Alert}
   #array set fave_talent {0 Wealthy 1 Alert 2 Miser 3 "Treasure Hunter"}
   #array set fave_talent {0 Alert 1 Charming 2 "Treasure Hunter"}
   set selected_talents {}
-  #set talents_list {}
+  set talents_list {}
+
+  # how this works:
+  #  - $j should be set to the talent we want
+  #
+  #
+  #
+  #
+
+  # read all the available talents into talents_list
+  send_user "choosing $talents talent(s)\n"
   while {1} {
     expect {
       -re "(\[A-Y]) - (\[A-Za-z -]*)" {
 	lappend talents_list "[string trimright $expect_out(2,string)]"
-        #send_user "$expect_out(1,string) - [expr [llength $talents_list] - 1] - $expect_out(2,string)\n"
+
+	# this will print the list of offered talents
+        send_user "  $expect_out(1,string) - [expr [llength $talents_list] - 1] - $expect_out(2,string)\n"
       }
       -re "\[^-]\r\u001b\\\[\[0-9]*d\\(more\\)" {
         expect "\\\[?] Help"
-	send "+"
-	#send_user "+\n"
-	if {!$talents_on_one_page} {set talents_on_one_page [llength $talents_list]}
+        send "+"
+        send_user "choosing next page\n"
+        #if {!$talents_on_one_page} {set talents_on_one_page [llength $talents_list]}
       }
       "\\\[?] Help" {
-        #send_user "AVAILABLE TALENTS: [llength $talents_list], PAGES: $page\n"
-	for {set i 0;set j -1;set k 0} {$i<[array size fave_talent]} {incr i;incr k} {
-	  if {$j==-1} {
-	    set j [lsearch $talents_list "$fave_talent($i)"]
-	  } else {
-	    if {$i==$k} {incr k -1}
-	    set fave_talent($k) $fave_talent($i)
-	  }
-	}
-	# FAVE TALENT FOUND?
-	if {$j!=-1} {
-	  array unset fave_talent [expr [array size fave_talent] - 1]
-	  #send_user "MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / [array size fave_talent] / talents-on-1-page: $talents_on_one_page\n"
-	}
-	if {$j!=-1} {
-	  #set talent($talents_selected) "[lindex $talents_list $j]"
-	  lappend selected_talents [lindex $talents_list $j]
-	  if {$j>[expr [llength $talents_list]-$talents_on_one_page]} {
-	    send "[lindex $alphabets [expr $j % $talents_on_one_page]]"
-	  } else {
-	    # TEMPORARY SOLUTION HERE!!!
-	    send "?"
-	    expect "\\\[Z] Exit"
-	    send "z"
-	    while {1} {
-	      expect {
-	        -re "(\[A-Y]) - [lindex $talents_list $j]" {
-		  expect "\\\[?] Help"
-		  send "$expect_out(1,string)"
-		  break
-		} "\\\[?] Help" {send -- "-"}
-	      }
-	    }
-	  }
-	} else {
-	  if {$re_roll_until} {send_user "x"} else {send_error "OUT OF FAVE TALENT!!!\n"}
-	  set random [expr {int(rand()*$talents_on_one_page)}]
-	  #send_user "random: $random - [lindex $alphabets $random] [expr [llength $talents_list] - $talents_on_one_page + $random] [lindex $talents_list [expr [llength $talents_list] - $talents_on_one_page + $random]]\n"
-
-	  send "[lindex $alphabets $random]"
-	  lappend selected_talents [lindex $talents_list [expr [llength $talents_list] - $talents_on_one_page + $random]]
-	}
-	set talents_list {}
+        send_user "AVAILABLE TALENTS: [llength $talents_list]\n"
+        break
       }
-      # EO [?] Help
-      "What is your name? " {break}
+      #"\\\[?] Help" {
+      #  send_user "AVAILABLE TALENTS: [llength $talents_list]\n"
+      #  for {set i 0;set j -1;set k 0} {$i<[array size fave_talent]} {incr i;incr k} {
+      #    if {$j==-1} {
+      #      set j [lsearch $talents_list "$fave_talent($i)"]
+      #    } else {
+      #      if {$i==$k} {incr k -1}
+      #      set fave_talent($k) $fave_talent($i)
+      #    }
+      #  }
+      #  # FAVE TALENT FOUND?
+      #  if {$j!=-1} {
+      #    array unset fave_talent [expr [array size fave_talent] - 1]
+      #    send_user "MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / [array size fave_talent] / talents-on-1-page: $talents_on_one_page\n"
+      #  }
+      #  if {$j!=-1} {
+      #    #set talent($talents_selected) "[lindex $talents_list $j]"
+      #    lappend selected_talents [lindex $talents_list $j]
+      #    send_user "j=$j \[expr \[llength \$talents_list\]-\$talents_on_one_page\]=[expr [llength $talents_list]-$talents_on_one_page]\n"
+
+      #    #if {$j>23&&$j<48} {
+      #    #  send_user "DEBUG: first if\n"
+      #    #  send -- "-"
+      #    #} elseif {$j<24} {
+      #    #  send_user "DEBUG: second if\n"
+      #    #  send -- "-"
+      #    #  send -- "-"
+      #    #}
+      #    ## choose the talent
+      #    #send "[lindex $alphabets [expr $j % $talents_on_one_page]]"
+      #    #send_user "sending \"[lindex $alphabets [expr $j % $talents_on_one_page]]\"\n"
+
+      #    if {$j>[expr [llength $talents_list]-$talents_on_one_page]} {
+      #      # choose the talent
+      #      send "[lindex $alphabets [expr $j % $talents_on_one_page]]"
+      #      send_user "sending \"[lindex $alphabets [expr $j % $talents_on_one_page]]\"\n"
+      #    } else {
+      #      # TEMPORARY SOLUTION HERE!!!
+      #      send "?"
+      #      expect "\\\[Z] Exit"
+      #      send "z"
+      #      while {1} {
+      #        expect {
+      #          -re "(\[A-Y]) - [lindex $talents_list $j]" {
+      #            expect "\\\[?] Help"
+      #            send "$expect_out(1,string)"
+      #            break
+      #          } "\\\[?] Help" {send -- "-"}
+      #        }
+      #      }
+      #    }
+      #  } else {
+      #    if {$re_roll_until} {send_user "x"} else {send_error "OUT OF FAVE TALENT!!!\n"}
+      #    set random [expr {int(rand()*$talents_on_one_page)}]
+      #    #send_user "random: $random - [lindex $alphabets $random] [expr [llength $talents_list] - $talents_on_one_page + $random] [lindex $talents_list [expr [llength $talents_list] - $talents_on_one_page + $random]]\n"
+
+      #    send "[lindex $alphabets $random]"
+      #    lappend selected_talents [lindex $talents_list [expr [llength $talents_list] - $talents_on_one_page + $random]]
+      #  }
+      #  set talents_list {}
+      #}
+      ## EO [?] Help
+      #"What is your name? " {break}
+    }
+  }
+
+  # rewind to the first page
+  send -- "-"
+  expect "\\\[?] Help"
+  send -- "-"
+
+  for {set talent_count 0} {$talent_count<$talents} {incr talent_count} {
+    # find the desired talent from talents_list
+    for {set i 0;set j -1;set k 0} {$i<[array size fave_talent]} {incr i;incr k} {
+      if {$j==-1} {
+        set j [lsearch $talents_list "$fave_talent($i)"]
+      } else {
+        if {$i==$k} {incr k -1}
+        set fave_talent($k) $fave_talent($i)
+      }
+    }
+    if {$j!=-1} {
+      #send_user "DEBUG: \[expr \[array size fave_talent] - 1]=[expr [array size fave_talent] - 1]\n"
+      array unset fave_talent [expr [array size fave_talent] - 1]
+      send_user "MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / [array size fave_talent] / talents-on-1-page: $talents_on_one_page\n"
+
+
+
+      send_user "DEBUG: elements in \$talents_list = [llength $talents_list]\n"
+      #send_user "DEBUG: \[lindex \$talents_list \$j]=[lindex $talents_list $j]\n"
+      #send_user "DEBUG: [lindex $talents_list $j]\n"
+      #array unset talents_list [lindex $talents_list $j]
+      #array unset talents_list "Affinity with Axes"
+      #array unset talents_list [lindex $talents_list 0]
+      #send_user "DEBUG: \[lsearch \$talents_list \[lindex \$talents_list \$j]]=[lsearch $talents_list [lindex $talents_list $j]]\n"
+
+      # remove the chosen talent from the offered talents list
+      # http://stackoverflow.com/questions/5701947/tcl-remove-an-element-from-a-list
+      set idx [lsearch $talents_list [lindex $talents_list $j]]
+      set talents_list [lreplace $talents_list $idx $idx]
+
+      send_user "DEBUG: elements in \$talents_list = [llength $talents_list]\n"
+
+      if {$j<24} {
+        send_user "sending \"[lindex $alphabets [expr $j % 22]]\"\n"
+        send "[lindex $alphabets [expr $j % 22]]"
+      # TODO: count the page
+      } elseif {$j>23&&$j<48} {
+        #expect "\\\[?] Help"
+        send "+"
+        send_user "sending \"[lindex $alphabets [expr $j % 23]]\"\n"
+        send "[lindex $alphabets [expr $j % 23]]"
+      } elseif {$j>47} {
+        #expect "\\\[?] Help"
+        send "+"
+        #expect "\\\[?] Help"
+        send "+"
+        send_user "sending \"[lindex $alphabets [expr $j % 23]]\"\n"
+        send "[lindex $alphabets [expr $j % 23]]"
+      }
+      #send "[lindex $alphabets [expr $j % $talents_on_one_page]]"
+      #send_user "sending \"[lindex $alphabets [expr $j % $talents_on_one_page]]\"\n"
     }
   }
   # END-OF TALENT LOOP
 
+  expect "What is your name? "
   send "$pc(name)\r"
 
   # ALIGN?!
