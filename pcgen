@@ -500,7 +500,7 @@ while {1} {
     send "q"
     while {1} {
       expect {
-        "Your father wants you to help him building"		{answer_question 1}
+        "Your father wants you to help him build"		{answer_question 1}
         "In your childhood slaves were forced to"			{answer_question 2}
         "You and your friends pass a lot of time"			{answer_question 3}
         "In cold winters lots of wood is needed to keep"		{answer_question 4}
