@@ -395,7 +395,7 @@ if {$re_roll_until&&$force_month} {
   exit 1
 }
 if {$pc(race)!="*"} {set pc(cur_race) $pc(race)}
-if {$pc(race)!="*"} {set pc(cur_profession) $pc(profession)}
+if {$pc(profession)!="*"} {set pc(cur_profession) $pc(profession)}
 ################################################################################
 if {$debug} {
   global attributes
