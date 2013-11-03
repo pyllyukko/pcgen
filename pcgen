@@ -1,7 +1,7 @@
 #!/usr/bin/expect --
 ################################################################################
 #
-# pcgen v0.3.1b for adom - by pyllyukko - 2002, 2005 & 2004 (not 2003=)
+# pcgen for adom - by pyllyukko - 2002-2013
 # send all suggestions, typo & bug reports, criticism & everything else to
 # pyllyukko <at> maimed <d0t> org
 # (before you mail anything please notice that this script is on beta stage)
@@ -48,7 +48,6 @@ set random_attributes 0
 set debug 0
 set re_roll_until 0
 array set done {0 1 1 1}
-set version "0.4.0b"
 set avg_margin 2
 ################################################################################
 ### DATA
@@ -246,7 +245,7 @@ proc answer_question {numero} {
 # make sure we have new enough version of expect
 exp_version -exit 5.41
 
-if {!$log_user} {send_user "pcgen v$version - by pyllyukko - 2002, 2004 & 2005\n\n"}
+if {!$log_user} {send_user "pcgen - by pyllyukko - 2002-2013\n\n"}
 if {![file executable $adom]} {send_error "error: \`$adom' not executable!\n";exit 1}
 if {![regexp "^\[a-j*]$" $pc(race)]} {
   send_error "error: invalid race \"$race\"!\n"
