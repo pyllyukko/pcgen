@@ -57,10 +57,10 @@ set race_test {{10 12 10 10 10 10 10 10 10 2} {18 5 8 8 18 6 5 6 7 -9} {10 13 9 
 # TODO: Chaos Knight & Duelist
 set proff_test {{3 -2 1 0 1 0 0 -3 0 0} {2 1 2 -1 0 4 2 1 0 11} {2 -1 0 1 2 -1 0 0 3 6} {0 0 0 3 0 1 2 0 3 9} {1 1 0 2 1 -2 0 0 2 5} {-2 3 3 1 -1 2 0 3 1 10} {0 2 4 -1 0 1 0 3 0 9} {0 2 1 2 1 3 3 1 1 14} {2 1 3 2 1 -3 -1 -1 2 6} {-1 1 3 1 4 1 0 1 1 11} {2 -1 1 1 3 0 0 1 1 8} {1 0 0 4 0 0 1 0 3 9} {0 1 2 1 0 3 1 0 1 9} {2 -2 0 0 1 -1 -1 0 1 0} {-3 2 4 1 -1 0 0 1 1 5} {5 -2 2 1 3 -1 -1 -4 1 4} {0 1 0 0 2 0 0 2 1 6} {-1 2 2 0 1 -4 -3 3 0 0} {-1 2 1 1 0 -2 -1 2 0 2} {4 -1 -1 4 4 -2 -1 -2 2 7} {0 0 0 0 0 0 0 0 0 0} {0 0 0 0 0 0 0 0 0 0}}
 
-set races {human troll "high elf" "gray elf" "dark elf" dwarf gnome hurthling orc drakeling "mist elf" ratling}
-set professions {fighter paladin ranger thief assassin wizard priest bard monk healer weaponsmith archer merchant farmer mindcrafter barbarian druid necromancer elementalist beastfighter "chaos knight" duelist}
-set attributes {strength learning willpower dexterity toughness charisma appearance mana perception}
-set starsigns {raven book wand unicorn salamander dragon sword falcon cup candle wolf tree}
+set races	{human troll "high elf" "gray elf" "dark elf" dwarf gnome hurthling orc drakeling "mist elf" ratling}
+set professions	{fighter paladin ranger thief assassin wizard priest bard monk healer weaponsmith archer merchant farmer mindcrafter barbarian druid necromancer elementalist beastfighter "chaos knight" duelist}
+set attributes	{strength learning willpower dexterity toughness charisma appearance mana perception}
+set starsigns	{raven book wand unicorn salamander dragon sword falcon cup candle wolf tree}
 
 # stats from http://www.adomgb.info/adomgb-0-1.html
 # TODO: Mist Elf & Ratling
