@@ -487,10 +487,10 @@ while {1} {
     # TODO: this might need tweaking!
     expect {
       -re "You are now a fully.*learned( |\r\u001b\\\[\[0-9]+d)(\[a-z]+)\." {set _profession $expect_out(2,string)}
-      #-re "You are now a fully.*learned( |.*\u001b\\\[\[0-9;]*\[dH])(\[a-z]*)\." {set _profession $expect_out(2,string)}
-      #-re "You are now a fully learned (\[a-z]*)\." {set _profession $expect_out(1,string)}
-      "path of a Chaos Knight lay before you" {set _profession "chaos knight"}
-      "you leave your tribe" {set _profession "barbarian"}
+      "path of a Chaos Knight lay before you"	{set _profession "chaos knight"}
+      "and became a Chaos Knight"		{set _profession "chaos knight"}
+      "part of your destiny as a Chaos Knight"	{set _profession "chaos knight"}
+      "you leave your tribe"			{set _profession "barbarian"}
     }
   }
   # RANDOMIZED?
