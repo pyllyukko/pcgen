@@ -500,55 +500,55 @@ while {1} {
     send "q"
     while {1} {
       expect {
-        "Your father wants you to help him build"		{answer_question 1}
+        "Your father wants you to help him build"			{answer_question 1}
         "In your childhood slaves were forced to"			{answer_question 2}
         "You and your friends pass a lot of time"			{answer_question 3}
         "In cold winters lots of wood is needed to keep"		{answer_question 4}
-        "Your grandfather always taught you to hone"		{answer_question 5}
+        "Your grandfather always taught you to hone"			{answer_question 5}
         "When exploring a long-forgotten shed in the woods"		{answer_question 6}
-        "You are offered two jobs on your first trip to the"	{answer_question 7}
+        "You are offered two jobs on your first trip to the"		{answer_question 7}
         "Your favorite teacher discovers you trying to cheat on a"	{answer_question 8}
-        "While crossing a ford on a well-known road you slip"	{answer_question 9}
+        "While crossing a ford on a well-known road you slip"		{answer_question 9}
         "You have been training with weapons for some time"		{answer_question 10}
-        "At one point you fall deeply into love. Your beloved"	{answer_question 11}
-        "While at a market, you discover a merchant"		{answer_question 12}
+        "At one point you fall deeply into love. Your beloved"		{answer_question 11}
+        "While at a market, you discover a merchant"			{answer_question 12}
         "While playing in the fields during your childhood"		{answer_question 13}
         "Soon after starting your apprenticeship you come"		{answer_question 14}
         "After serving your master for several months, you"		{answer_question 15}
-        "Having finally mastered the basics of your profession"	{answer_question 16}
-        "The final day of your apprenticeship has come"		{answer_question 17}
+        "Having finally mastered the basics of your profession"		{answer_question 16}
+        "The final day of your apprenticeship has come"			{answer_question 17}
         "After ending your apprenticeship you travel the country"	{answer_question 18}
         "Evil has started to invade the world, subtle and"		{answer_question 19}
-        "Now that you are old enough, your parents gave you"	{answer_question 20}
-        "As you make your way toward the chain of mountains"	{answer_question 21}
-        "During your apprenticeship under an elderly wizard"	{answer_question 22}
-        "While doing research in a library, you come across"	{answer_question 23}
-        "During a night out, one of your friends is mugged and"	{answer_question 24}
+        "Now that you are old enough, your parents gave you"		{answer_question 20}
+        "As you make your way toward the chain of mountains"		{answer_question 21}
+        "During your apprenticeship under an elderly wizard"		{answer_question 22}
+        "While doing research in a library, you come across"		{answer_question 23}
+        "During a night out, one of your friends is mugged and"		{answer_question 24}
         "While on a journey, your carriage is attacked by"		{answer_question 25}
         "If you came across an animal that was writhing in agony"	{answer_question 26}
-        "Your brother has come asking that you hide him from"	{answer_question 27}
+        "Your brother has come asking that you hide him from"		{answer_question 27}
         "You are carrying your liege\'s gold to his castle"		{answer_question 28}
-        "You have stolen to feed your family and the guards"	{answer_question 29}
+        "You have stolen to feed your family and the guards"		{answer_question 29}
         "Your king lies dying, the battle is lost. He asks"		{answer_question 30}
-        "You are called home to run your late father\'s shop"	{answer_question 31}
-        "You are a witness to a crime. You are called"		{answer_question 32}
-        "As a child, whenever your friends had an idea"		{answer_question 33}
-        "While shopping, you spot someone stealing something"	{answer_question 34}
+        "You are called home to run your late father\'s shop"		{answer_question 31}
+        "You are a witness to a crime. You are called"			{answer_question 32}
+        "As a child, whenever your friends had an idea"			{answer_question 33}
+        "While shopping, you spot someone stealing something"		{answer_question 34}
         "One night you wake up of a strange dog whining"		{answer_question 35}
-        "When your father took you hunting for the first time"	{answer_question 36}
+        "When your father took you hunting for the first time"		{answer_question 36}
         "What would you order in a restaurant for lunch"		{answer_question 37}
         "What about you gave your parents the most grief"		{answer_question 38}
         "Will you fight evil..."					{answer_question 39}
         "You are in a nobleman\'s house as a dinner guest. While"	{answer_question 40}
         "There have been whispers throughout the land of"		{answer_question 41}
         "Your mind made up, you pack your bags and prepare"		{answer_question 42}
-        "On your way to the Drakalor Chain, you find"		{answer_question 43}
-        "You attempt to make an arrow and you do not"		{answer_question 44}
-        "You are walking on the street, when you see a gang"	{answer_question 45}
-        "You are chopping wood at your cottage in the woods"	{answer_question 46}
-        "You return back from your hunting trip and you notice"	{answer_question 47}
+        "On your way to the Drakalor Chain, you find"			{answer_question 43}
+        "You attempt to make an arrow and you do not"			{answer_question 44}
+        "You are walking on the street, when you see a gang"		{answer_question 45}
+        "You are chopping wood at your cottage in the woods"		{answer_question 46}
+        "You return back from your hunting trip and you notice"		{answer_question 47}
         "Your father has apprenticed you to the local smith. Do"	{answer_question 48}
-        "You find yourself working as an apprentice to a wise"	{answer_question 49}
+        "You find yourself working as an apprentice to a wise"		{answer_question 49}
         "While learning tricks of the trade from your wise"		{answer_question 50}
         "After many years of toil, you have completed your"		{answer_question 51}
   ################################################################################
