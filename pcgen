@@ -48,21 +48,25 @@ set random_attributes 0
 set debug 0
 set re_roll_until 0
 array set done {0 1 1 1}
-set version "0.3.1b"
-set talents_on_one_page 0
+set version "0.4.0b"
 set avg_margin 2
 ################################################################################
 ### DATA
-set race_test {{10 12 10 10 10 10 10 10 10 2} {18 5 8 8 18 6 5 6 7 -9} {10 13 9 15 8 10 14 13 14 16} {10 13 10 14 7 8 18 15 14 19} {9 10 12 15 9 7 12 16 13 13} {12 11 11 9 13 9 9 10 11 5} {9 11 9 12 11 12 10 14 11 9} {6 10 10 15 12 12 10 8 10 3} {14 8 10 10 13 8 7 6 8 -6} {13 10 12 9 13 10 8 10 9 4}}
-set proff_test {{3 -2 1 0 1 0 0 -3 0 0} {2 1 2 -1 0 4 2 1 0 11} {2 -1 0 1 2 -1 0 0 3 6} {0 0 0 3 0 1 2 0 3 9} {1 1 0 2 1 -2 0 0 2 5} {-2 3 3 1 -1 2 0 3 1 10} {0 2 4 -1 0 1 0 3 0 9} {0 2 1 2 1 3 3 1 1 14} {2 1 3 2 1 -3 -1 -1 2 6} {-1 1 3 1 4 1 0 1 1 11} {2 -1 1 1 3 0 0 1 1 8} {1 0 0 4 0 0 1 0 3 9} {0 1 2 1 0 3 1 0 1 9} {2 -2 0 0 1 -1 -1 0 1 0} {-3 2 4 1 -1 0 0 1 1 5} {5 -2 2 1 3 -1 -1 -4 1 4} {0 1 0 0 2 0 0 2 1 6} {-1 2 2 0 1 -4 -3 3 0 0} {-1 2 1 1 0 -2 -1 2 0 2} {4 -1 -1 4 4 -2 -1 -2 2 7}}
+# TODO: Mist Elf & Ratling
+set race_test {{10 12 10 10 10 10 10 10 10 2} {18 5 8 8 18 6 5 6 7 -9} {10 13 9 15 8 10 14 13 14 16} {10 13 10 14 7 8 18 15 14 19} {9 10 12 15 9 7 12 16 13 13} {12 11 11 9 13 9 9 10 11 5} {9 11 9 12 11 12 10 14 11 9} {6 10 10 15 12 12 10 8 10 3} {14 8 10 10 13 8 7 6 8 -6} {13 10 12 9 13 10 8 10 9 4} {0 0 0 0 0 0 0 0 0 0} {0 0 0 0 0 0 0 0 0 0}}
+# TODO: Chaos Knight & Duelist
+set proff_test {{3 -2 1 0 1 0 0 -3 0 0} {2 1 2 -1 0 4 2 1 0 11} {2 -1 0 1 2 -1 0 0 3 6} {0 0 0 3 0 1 2 0 3 9} {1 1 0 2 1 -2 0 0 2 5} {-2 3 3 1 -1 2 0 3 1 10} {0 2 4 -1 0 1 0 3 0 9} {0 2 1 2 1 3 3 1 1 14} {2 1 3 2 1 -3 -1 -1 2 6} {-1 1 3 1 4 1 0 1 1 11} {2 -1 1 1 3 0 0 1 1 8} {1 0 0 4 0 0 1 0 3 9} {0 1 2 1 0 3 1 0 1 9} {2 -2 0 0 1 -1 -1 0 1 0} {-3 2 4 1 -1 0 0 1 1 5} {5 -2 2 1 3 -1 -1 -4 1 4} {0 1 0 0 2 0 0 2 1 6} {-1 2 2 0 1 -4 -3 3 0 0} {-1 2 1 1 0 -2 -1 2 0 2} {4 -1 -1 4 4 -2 -1 -2 2 7} {0 0 0 0 0 0 0 0 0 0} {0 0 0 0 0 0 0 0 0 0}}
 
-set races {human troll "high elf" "gray elf" "dark elf" dwarf gnome hurthling orc drakeling}
-set professions {fighter paladin ranger thief assassin wizard priest bard monk healer weaponsmith archer merchant farmer mindcrafter barbarian druid necromancer elementalist beastfighter}
+set races {human troll "high elf" "gray elf" "dark elf" dwarf gnome hurthling orc drakeling "mist elf" ratling}
+set professions {fighter paladin ranger thief assassin wizard priest bard monk healer weaponsmith archer merchant farmer mindcrafter barbarian druid necromancer elementalist beastfighter "chaos knight" duelist}
 set attributes {strength learning willpower dexterity toughness charisma appearance mana perception}
 set starsigns {raven book wand unicorn salamander dragon sword falcon cup candle wolf tree}
 
-array set race_avg {a 2 b -9 c 16 d 19 e 13 f 5 g 9 h 3 i -6 j 4}
-array set prof_avg {a 0 b 11 c 6 d 9 e 5 f 10 g 9 h 14 i 6 j 11 k 8 l 9 m 9 n 0 o 5 p 4 q 6 r 0 s 2 t 7}
+# stats from http://www.adomgb.info/adomgb-0-1.html
+# TODO: Mist Elf & Ratling
+array set race_avg {a 2 b -9 c 16 d 19 e 13 f 5 g 9 h 3 i -6 j 4 k 0 l 0}
+# TODO: Chaos Knight & Duelist
+array set prof_avg {a 0 b 11 c 6 d 9 e 5 f 10 g 9 h 14 i 6 j 11 k 8 l 9 m 9 n 0 o 5 p 4 q 6 r 0 s 2 t 7 u 0 v 0}
 set answers {1 -1 0 0 1 0 0 0 -1 1 0 -1 0 0 -1 0 0 1 0 1 0 0 0 -1 0 0 0 -1 1 1 0 0 -1 0 0 0 1 -1 1 0 1 -1 -1 0 0 0 1 0 0 0 -1 0 0 0 -1 1 1 0 -1 0 0 0 0 1 0 0 0 1 1 0 -2 0 1 -1 0 1 1 -1 0 -1 0 0 1 -1 1 0 -1 0 0 0 -1 0 0 -1 0 0 0 2 0 -1 0 0 0 -1 -1 0 1 2 1 0 0 0 0 0 0 0 -1 0 0 1 0 0 0 0 -1 0 -1 1 0 0 0 0 0 0 0 1 -1 0 0 1 -1 0 0 0 0 2 0 0 -1 -1 0 0 0 0 1 0 0 -1 -1 0 1 0 0 1 -1 1 0 -1 -1 0 1 0 0 0 0 0 0 0 0 0 0 1 1 0 -1 -1 0 0 0 0 -1 0 0 1 0 0 0 0 0 1 0 -1 0 1 0 0 -1 0 -1 0 1 0 0 0 0 0 0 2 0 -1 -1 0 0 0 0 0 0 0 0 0 0 0 1 -1 0 -1 0 1 0 0 0 0 0 0 0 1 1 -1 0 0 -1 0 0 -1 2 0 0 -1 0 0 0 0 0 -1 0 0 0 0 0 1 0 -1 -1 1 0 0 0 0 1 0 1 0 0 0 -1 0 0 0 0 -1 0 0 1 0 0 0 0 0 0 2 -1 -1 0 0 0 0 0 -1 -1 0 0 0 0 2 0 0 0 0 1 -1 0 0 0 0 0 1 0 -1 0 0 0 0 0 0 -2 2 0 1 0 -1 0 0 0 1 0 1 0 -2 0 0 0 0 1 -2 0 0 0 0 0 1 0 -1 2 0 0 -1 0 0 0 0 0 -1 0 0 -1 0 1 1 0 0 -1 1 0 -1 0 1 0 0 1 0 0 0 0 0 -1 0 0 -1 0 1 0 0 0 -1 1 0 -1 0 2 0 -1 0 0 0 1 0 0 -1 0 -1 0 0 1 0 0 1 0 0 0 0 -1 0 0 0 0 0 0 0 1 -1 0 0 1 0 0 -1 0 0 0 0 0 0 0 0 0 1 0 -1 0 0 -1 0 0 0 -1 0 1 1 0 1 -1 0 1 -1 0 0 0 0 0 -2 0 0 0 0 2 0 0 -1 1 0 -1 1 0 0 0 0 -2 0 1 0 0 0 1 0 0 -1 1 0 0 0 0 0 0 0 1 -1 0 0 0 0 -1 1 0 0 -1 1 0 -1 0 1 0 0 1 1 0 0 0 0 -2 0 0 1 -1 0 0 -1 0 1 0 0 -1 1 0 0 0 0 0 0 1 -1 1 0 1 0 0 -1 -1 0 -1 1 0 0 0 0 1 -1 0 -1 0 0 1 0 0 0 0 0 0 0 1 -1 0 0 0 0 0 0 0 0 0 1 0 -1 0 0 1 0 -1 0 0 0 0 0 0 0 0 1 1 -1 0 -1 0 1 -1 0 0 1 0 0 -1 0 -1 0 0 1 -1 0 0 1 0 1 0 0 -1 0 0 0 0 0 0 0 0 1 0 -1 0 0 0 0 -1 0 0 0 0 0 1 0 0 1 0 0 0 0 0 -1 0 0 -1 -1 0 0 0 0 2 0 -1 0 0 1 -1 0 0 0 1 -1 1 -2 1 1 -1 0 0 1 0 1 0 1 0 -2 0 -1 1 -1 0 1 0 0 0 0 0 0 0 0 1 0 0 1 0 -2 0 0 0 0 0 0 -1 0 1 0 0 0 -1 1 0 0 0 0 0 -1 1 -1 1 0 -1 0 0 1 0 0 0 -1 0 2 0 -1 0 0 1 -1 0 0 -1 0 1 0 0 0 -1 0 1 0 0 0 0 0 0 1 0 0 0 0 0 -1 -1 1 0 0 0 1 0 -1 0 -1 0 0 0 -1 0 0 2 0 -1 -1 0 1 0 0 0 1 0 0 0 0 0 0 0 0 -1 1 -1 0 0 0 -1 1 0 1 0 1 -1 0 0 1 -1 0 0 0 0 0 0 0 1 1 0 -1 -1 0 0 1 0 -1 0 0 0 0 0 1 0 0 -2 1 0 0 0 0 -1 1 1 -1 0 0 0 0 -1 0 -1 1 0 0 0 0 1 0 0 -1 0 1 0 0 -1 1 1 0 0 0 1 -1 0 -1 0 0 0 0 1 0 -1 0 0 0 0 0 1 0 0 -1 0 0 0 0 0 1 0 0 0 -2 1 0 1 0 1 -1 0 -1 0 0 0 0 1 -1 0 0 1 0 0 -1 0 -1 1 0 0 0 0 0 0 -1 0 0 1 0 1 0 0 -1 0 -1 0 0 0 1 0 1 -1 0 0 0 0 0 1 0 0 -1 1 0 0 1 0 -1 0 -1 0 1 0 0 0 1 0 0 -1 -1 0 0 -1 1 -1 0 0 0 1 1 -2 0 0 1 0 0 0 0 0 -1 0 0 0 1 0 1 -1 0 -1 0 0 0 0 0 1 0 0 0 -1 0 0 1 0 0 0 0 0 2 0 0 -1 0 -1 0 1 -1 0 0 1 -1 0 0 0 0 -1 0 1 0 0 0 0 0 0 0 -1 0 0 1 0 -1 1 0 0 2 0 0 -1 0 0 -1 0 1 0 0 0 -1 0 1 -1 0 0 1 0 0 0 0 0 -1 0 1 0 0 0 -1 0 0 0 0 0 -1 0 0 -1 0 2 0 0 0 1 0 0 0 0 -1 0 0 0 1 0 0 -1 0 0 0 0 0 -1 0 0 0 0 1 0 0 1 0 0 0 0 0 0 -1 0 0 0 0 -1 1 0 0 0 0 0 0 1 0 -1 0 0 0 0 1 0 0 0 0 0 0 -1 1 -1 0 1 0 0 0 -1 0 0 -1 0 -1 0 0 0 2 0 0 0 0 0 0 -1 0 1 0 1 0 0 -1 1 -1 0 0 0 0 1 0 1 0 0 0 -1 -1 0 1 0 0 0 0 0 -1 0 0 0 1 0 0 -1 0 0 0 1 -1 -1 0 1 0 0 0 0 1 1 0 0 -1 0 0 -1 0 1 0 0 0 1 -2 0 0 0 0 0 2 0 0 -2 0 0 0 1 -1 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 1 0 -1 0 0 1 0 0 0 0 0 0 0 0 0 0 1 0 -1 0 0 0 1 0 0 -1 0 0 0 0 0 0 0 0 -2 0 1 1 0 0 0 1 0 -1 0 0 0 0 0 0 -1 1 0 0 0 0 1 -1 1 -1 0 0 0 0 0 -1 1 0 0 0 0 0 0 0 0 -1 0 0 0 1 0 0 0 -1 0 0 0 -1 1 0 1 0 0 0 -1 1 0 0 0 0 0 0 1 0 0 0 0 0 -1 0 1 -1 0 0 0 0 0 0 0 0 -1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 -1 1 0 1 -1 0 0 0 0 0 0 0 0 0 0 0 -1 0 1 0 0 0 0 0 1 0 0 0 -1 1 0 0 -1 0 0 0 0 0 -1 1 0 0 0 0 0 0 0 0 0 0 -1 1 0 0 0 0 0 0 0 1 -1 0 0 0 0 0 0 0 -1 1 0 0 0 0 0 0 0 0 0 0 0 -1 1 0 1 0 0 0 0 0 -1 0 1 -1 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 1 0 0 -1 1 0 0 0 0 0 0 1 -1 0 0 0 0 0 0 0 0 0 1 -1 0 0 0 -1 1 1 -1 0 0 0 0 0 0 0 0 0 -1 1 0 0 0 0 0 1 0 0 0 1 -1 0 -1 0 -1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 -1 0 0 0 0 1 0 0 0 -1 0 0 0 1 0 0 0 0 -1 0 0 0 0 0 0 -1 0 1 0 0 -1 1 0 0 0 0 0 0 0 0 -1 0 0 0 0 1 0 1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 1 0 -1 1 0 0 0 0 0 0 0 0 1 0 1 -1 0 -1 0 0 0 1 0 0 -1 0 0 0 0 0 -1 1 0 -1 0 1 0 0 -1 0 0 0 1 0 1 -1 0 1 0 -1 0 0 0 0 0 0 -1 0 1 0 -1 0 1 0 0 0 -1 0 0 0 0 1 0 0 -1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 -1 0 1 -1 0 0 -1 0 1 0 0 1 0 0 0 0 0 -1 0 0 0 1 0 0 0 0 0 -1 0 0 1 0 0 0 0 -1 0 1 0 0 0 1 0 0 -2 0 0 1 0 0 0 0 0 -1 0}
 set alphabets {a b c d e f g h i j k l m n o p q r s t u v w x y}
 ################################################################################
@@ -485,13 +489,54 @@ while {1} {
       -re "You are now a fully.*learned( |\r\u001b\\\[\[0-9]+d)(\[a-z]+)\." {set _profession $expect_out(2,string)}
       #-re "You are now a fully.*learned( |.*\u001b\\\[\[0-9;]*\[dH])(\[a-z]*)\." {set _profession $expect_out(2,string)}
       #-re "You are now a fully learned (\[a-z]*)\." {set _profession $expect_out(1,string)}
+      "path of a Chaos Knight lay before you" {set _profession "chaos knight"}
       "you leave your tribe" {set _profession "barbarian"}
     }
   }
   # RANDOMIZED?
   # LSEARCH
-  if {$pc(race)=="*"} {switch -- $_race "human" {set pc(cur_race) "a"} "troll" {set pc(cur_race) "b"} "high elf" {set pc(cur_race) "c"} "gray elf" {set pc(cur_race) "d"} "dark elf" {set pc(cur_race) "e"} "dwarf" {set pc(cur_race) "f"} "gnome" {set pc(cur_race) "g"} "hurthling" {set pc(cur_race) "h"} "orc" {set pc(cur_race) "i"} "drakeling" {set pc(cur_race) "j"}}
-  if {$pc(profession)=="*"} {switch -- $_profession "fighter" {set pc(cur_profession) "a"} "paladin" {set pc(cur_profession) "b"} "ranger" {set pc(cur_profession) "c"} "thief" {set pc(cur_profession) "d"} "assassin" {set pc(cur_profession) "e"} "wizard" {set pc(cur_profession) "f"} "priest" {set pc(cur_profession) "g"} "bard" {set pc(cur_profession) "h"} "monk" {set pc(cur_profession) "i"} "healer" {set pc(cur_profession) "j"} "weaponsmith" {set pc(cur_profession) "k"} "archer" {set pc(cur_profession) "l"} "merchant" {set pc(cur_profession) "m"} "farmer" {set pc(cur_profession) "n"} "mindcrafter" {set pc(cur_profession) "o"} "barbarian" {set pc(cur_profession) "p"} "druid" {set pc(cur_profession) "q"} "necromancer" {set pc(cur_profession) "r"} "elementalist" {set pc(cur_profession) "s"} "beastfighter" {set pc(cur_profession) "t"}}
+  if {$pc(race)=="*"} {
+    switch -- $_race {
+      "human"		{set pc(cur_race) "a"}
+      "troll"		{set pc(cur_race) "b"}
+      "high elf"	{set pc(cur_race) "c"}
+      "gray elf"	{set pc(cur_race) "d"}
+      "dark elf"	{set pc(cur_race) "e"}
+      "dwarf"		{set pc(cur_race) "f"}
+      "gnome"		{set pc(cur_race) "g"}
+      "hurthling"	{set pc(cur_race) "h"}
+      "orc"		{set pc(cur_race) "i"}
+      "drakeling"	{set pc(cur_race) "j"}
+      "mist elf"	{set pc(cur_race) "k"}
+      "ratling"		{set pc(cur_race) "l"}
+    }
+  }
+  if {$pc(profession)=="*"} {
+    switch -- $_profession {
+      "fighter"		{set pc(cur_profession) "a"}
+      "paladin"		{set pc(cur_profession) "b"}
+      "ranger"		{set pc(cur_profession) "c"}
+      "thief"		{set pc(cur_profession) "d"}
+      "assassin"	{set pc(cur_profession) "e"}
+      "wizard"		{set pc(cur_profession) "f"}
+      "priest"		{set pc(cur_profession) "g"}
+      "bard"		{set pc(cur_profession) "h"}
+      "monk"		{set pc(cur_profession) "i"}
+      "healer"		{set pc(cur_profession) "j"}
+      "weaponsmith"	{set pc(cur_profession) "k"}
+      "archer"		{set pc(cur_profession) "l"}
+      "merchant"	{set pc(cur_profession) "m"}
+      "farmer"		{set pc(cur_profession) "n"}
+      "mindcrafter"	{set pc(cur_profession) "o"}
+      "barbarian"	{set pc(cur_profession) "p"}
+      "druid"		{set pc(cur_profession) "q"}
+      "necromancer"	{set pc(cur_profession) "r"}
+      "elementalist"	{set pc(cur_profession) "s"}
+      "beastfighter"	{set pc(cur_profession) "t"}
+      "chaos knight"	{set pc(cur_profession) "u"}
+      "duelist"		{set pc(cur_profession) "v"}
+    }
+  }
 
   expect "Press SPACE to continue]"
   send " "
