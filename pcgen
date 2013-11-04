@@ -638,25 +638,27 @@ while {1} {
 
   # read all the available talents into talents_list
   send_user "choosing $talents talent(s):\n"
-  for {set talent_count 0} {$talent_count<$talents} {incr talent_count} {
+  for {set talent_count 0;set pages 0} {$talent_count<$talents} {incr talent_count;set pages 0} {
     send_user "\ntalent $talent_count:\n"
     set talents_list {}
     send_user "DEBUG666: elements in \$talents_list = [llength $talents_list]\n"
+    send_user "DEBUG666: AVAILABLE TALENTS: [llength $talents_list]\n"
     while {1} {
       expect {
-        -re "(\[A-Y]) - (\[A-Za-z -]*)" {
+        -re "(\[A-Z]) - (\[A-Za-z -]*)" {
           lappend talents_list "[string trimright $expect_out(2,string)]"
 
           # this will print the list of offered talents
           if {$debug} {send_user "  $expect_out(1,string) - [expr [llength $talents_list] - 1] - $expect_out(2,string)\n"}
         }
         #-re "\[^-]\r\u001b\\\[\[0-9]*d\\(more\\)"
-        #-re "\[^-]\r\u001b\\\[\[0-9]*d\\(more\\)\u001b.*Choose talent"
-        -re "\\(more\\).*Choose talent" {
+        -re "\[^-]\r\u001b\\\[\[0-9]*d\\(more\\)\u001b.*Choose talent" {
+        #-re "\\(more\\).*Choose talent"
           expect "\\\[?] Help"
           #sleep 2
           send "+"
           send_user "  choosing next page\n"
+          incr pages
         }
         "\\\[?] Help" {
           send_user "  AVAILABLE TALENTS: [llength $talents_list]\n"
@@ -664,18 +666,30 @@ while {1} {
         }
       }
     }
+    send_user "pages: $pages\n"
     #send "[lindex $alphabets [expr $j % $talents_on_one_page]]"
     #send "a"
     #send_user "sending \"a\"\n"
     send_user "out of while loop\n"
 
+    #send "a"
+    #send_user "  selecting a\n"
+    #continue
 
+    for {set page 0} {$page<$pages} {incr page} {
+      send_user "rewind page\n"
+      #sleep 1
+      send -- "-"
+      #sleep 1
+      expect "\\\[?] Help"
+      #expect "Choose talent"
+    }
 
-    # rewind to the first page
-    send -- "-"
-    expect -re ".*"
-    send -- "-"
-    expect -re ".*"
+    ## rewind to the first page
+    #send -- "-"
+    #expect *
+    #send -- "-"
+    #expect *
 
     # find the desired talent from talents_list
     for {set i 0;set j -1;set k 0} {$i<[array size fave_talents]} {incr i;incr k} {
@@ -706,16 +720,23 @@ while {1} {
       } elseif {$j>23&&$j<48} {
         expect -re ".*"
         send "+"
+        #expect "Choose talent"
+	expect "\\\[?] Help"
         send_user "  sending \"[lindex $alphabets [expr $j % 23]]\"\n"
         send "[lindex $alphabets [expr $j % 23]]"
+        #expect *
       # third page
       } elseif {$j>47} {
         expect -re ".*"
         send "+"
-        expect -re ".*"
+        #expect "Choose talent"
+	expect "\\\[?] Help"
         send "+"
+        #expect "Choose talent"
+	expect "\\\[?] Help"
         send_user "  sending \"[lindex $alphabets [expr $j % 23]]\"\n"
         send "[lindex $alphabets [expr $j % 23]]"
+	#expect *
       }
       #send "[lindex $alphabets [expr $j % $talents_on_one_page]]"
       #send_user "sending \"[lindex $alphabets [expr $j % $talents_on_one_page]]\"\n"
