@@ -120,6 +120,7 @@ proc ask_user {} {
   if {$talents==1} {
     send_user "talent: \033\[1;31m[string tolower [lindex $selected_talents 0]]\033\[0m\n"
   } else {
+    # TODO: FIX!
     send_user "talents: "
     for {set x 0} {$x<[expr $talents - 1]} {incr x} {
       if {$x==[expr $talents - 2]} {
