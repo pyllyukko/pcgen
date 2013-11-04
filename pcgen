@@ -627,12 +627,12 @@ while {1} {
   #   - CAREFUL:	5
   #     - VERY CAREFUL:	"If, however, you're a spellcaster, or you generally fight at the Very Defensive setting, this can be a useful bonus."
   #array set fave_talents {0 Alert 1 "Good Learner" 2 Healthy 3 Learned 4 Careful 5 Miser 6 "Treasure Hunter" 7 Tough 8 Wealthy}
-  #array set fave_talents {0 Alert 1 Miser 2 "Treasure Hunter" 3 "Good Learner" 4 Healthy 5 Learned 6 Careful 7 Tough 8 Wealthy}
+  array set fave_talents {0 Alert 1 Miser 2 "Treasure Hunter" 3 "Good Learner" 4 Healthy 5 Learned 6 Careful 7 Tough 8 Wealthy}
 
 
   # test if the talent system works with last page talents
   #array set fave_talents {0 Wealthy 1 Tough 2 "Strong Thrower" 3 Learned 4 Porter}
-  array set fave_talents {0 Careful 1 Charming 2 Dextrous 3 Fey-Blooded 4 "Good Learner" 5 Alert 6 Miser 7 "Treasure Hunter" 8 Healthy 9 Learned 10 Tough 11 Wealthy}
+  #array set fave_talents {0 Careful 1 Charming 2 Dextrous 3 Fey-Blooded 4 "Good Learner" 5 Alert 6 Miser 7 "Treasure Hunter" 8 Healthy 9 Learned 10 Tough 11 Wealthy}
 
   # test if the talent system works with first page talents
   #array set fave_talents {0 Aggressive 1 Ambidextrous 2 Basher 3 Brawler 4 Alert 5 Miser 6 "Treasure Hunter" 7 "Good Learner" 8 Healthy 9 Learned 10 Careful 11 Tough 12 Wealthy}
@@ -731,13 +731,15 @@ while {1} {
 	expect "\\\[?] Help"
         send_user "  sending \"[lindex $alphabets [expr $j - 23]]\"\n"
         send "[lindex $alphabets [expr $j - 23]]"
-      } elseif {$j>22&&$j<48} {
+      } elseif {$j>22&&$j<47} {
         expect -re ".*"
         send "+"
         #expect "Choose talent"
-	expect "\\\[?] Help"
-        send_user "  sending \"[lindex $alphabets [expr $j % 23]]\"\n"
-        send "[lindex $alphabets [expr $j % 23]]"
+        expect "\\\[?] Help"
+        #send_user "  sending \"[lindex $alphabets [expr $j % 23]]\"\n"
+        #send "[lindex $alphabets [expr $j % 23]]"
+        send_user "  sending \"[lindex $alphabets [expr $j - 23]]\"\n"
+        send "[lindex $alphabets [expr $j - 23]]"
         #expect *
       # third page
       } elseif {$j>46&&$pages==2} {
@@ -749,7 +751,8 @@ while {1} {
         send "+"
         #expect "Choose talent"
 	expect "\\\[?] Help"
-        send_user "  sending \"[lindex $alphabets [expr $j % 47]]\"\n"
+        #send_user "  sending \"[lindex $alphabets [expr $j % 47]]\"\n"
+        send_user "  sending \"[lindex $alphabets [expr $j - 47]]\"\n"
         send "[lindex $alphabets [expr $j - 47]]"
 	#expect *
       } else {
