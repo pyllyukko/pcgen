@@ -111,6 +111,7 @@ proc ask_user {} {
   send_user "sex:\t\t\033\[1;31m${_sex}\033\[0m\n"
   send_user "race:\t\t\033\[1;31m${_race}\033\[0m\n"
   send_user "profession:\t\033\[1;31m${_profession}\033\[0m\n"
+  send_user "type:\t\t\033\[1;31m$pc(profession_type)\033\[0m\n"
 
   foreach attribute $attributes {
     switch -- $attribute "mana" {send_user "$attribute:\t\t"} default {send_user "$attribute:\t"}
@@ -535,6 +536,15 @@ while {1} {
       "chaos knight"	{set pc(cur_profession) "u"}
       "duelist"		{set pc(cur_profession) "v"}
     }
+  }
+  # profession "type"
+  # from http://www.adomgb.info/adomfaq.html#3.1.1
+  if {[regexp "^\[fgqrs]$" $pc(cur_profession)]} {
+    set pc(profession_type) "spellcaster"
+  } elseif {[regexp "^\[abcikpt]$" $pc(cur_profession)]} {
+    set pc(profession_type) "warrior"
+  } else {
+    set pc(profession_type) "other"
   }
 
   expect "Press SPACE to continue]"
