@@ -22,12 +22,6 @@
 ################################################################################
 array set wanted {strength 2 learning 2 willpower 2 dexterity 2 toughness 2 charisma 1 appearance 1 mana 2 perception 1}
 ################################################################################
-#array set fave_talent {0 Healthy 1 Porter 2 Careful 3 Stealthy 4 Long-Lived}
-#array set fave_talent {0 Alert 1 Miser 2 "Treasure Hunter" 3 Stealthy 4 Long-Lived}
-#set fave_talents {Alert Miser "Treasure Hunter" Stealthy Long-Lived}
-#set fave_talents {Alert Miser "Treasure Hunter" Wealthy}
-#array set fave_talent {0 "Boon to the Family" 1 Charming 2 Heir 3 Stealthy 4 Long-Lived}
-################################################################################
 set timeout -1
 
 #array set pc {sex * race d profession f}
@@ -624,11 +618,14 @@ while {1} {
   ################################################################################
   #system rm -f debug.log
   ################################################################################
-  #array set fave_talent {0 Alert 1 Miser 2 "Treasure Hunter" 3 Stealthy 4 Long-Lived}
-  array set fave_talent {0 "Good Learner" 1 Healthy 2 Learned 3 Careful 4 Alert 5 Miser 6 "Treasure Hunter" 7 Tough 8 Wealthy}
-  #array set fave_talent {0 Alert}
-  #array set fave_talent {0 Wealthy 1 Alert 2 Miser 3 "Treasure Hunter"}
-  #array set fave_talent {0 Alert 1 Charming 2 "Treasure Hunter"}
+  # http://www.adomgb.info/adomfaq.html#2.15
+  # desired talents:
+  #   - alert is a must!
+  #   - QUICK:		8
+  #   - GOOD LEARNER:	"Not quite good enough for serious consideration."
+  #   - CAREFUL:	5
+  #     - VERY CAREFUL:	"If, however, you're a spellcaster, or you generally fight at the Very Defensive setting, this can be a useful bonus."
+  array set fave_talents {0 Alert 1 "Good Learner" 2 Healthy 3 Learned 4 Careful 5 Miser 6 "Treasure Hunter" 7 Tough 8 Wealthy}
   set selected_talents {}
   set talents_list {}
 
@@ -640,39 +637,38 @@ while {1} {
   #
 
   # read all the available talents into talents_list
-  send_user "choosing $talents talent(s)\n"
+  send_user "choosing $talents talent(s):\n"
   while {1} {
     expect {
       -re "(\[A-Y]) - (\[A-Za-z -]*)" {
 	lappend talents_list "[string trimright $expect_out(2,string)]"
 
 	# this will print the list of offered talents
-        send_user "  $expect_out(1,string) - [expr [llength $talents_list] - 1] - $expect_out(2,string)\n"
+        if {$debug} {send_user "  $expect_out(1,string) - [expr [llength $talents_list] - 1] - $expect_out(2,string)\n"}
       }
       -re "\[^-]\r\u001b\\\[\[0-9]*d\\(more\\)" {
         expect "\\\[?] Help"
         send "+"
-        send_user "choosing next page\n"
-        #if {!$talents_on_one_page} {set talents_on_one_page [llength $talents_list]}
+        send_user "  choosing next page\n"
       }
       "\\\[?] Help" {
-        send_user "AVAILABLE TALENTS: [llength $talents_list]\n"
+        send_user "  AVAILABLE TALENTS: [llength $talents_list]\n"
         break
       }
       #"\\\[?] Help" {
       #  send_user "AVAILABLE TALENTS: [llength $talents_list]\n"
-      #  for {set i 0;set j -1;set k 0} {$i<[array size fave_talent]} {incr i;incr k} {
+      #  for {set i 0;set j -1;set k 0} {$i<[array size fave_talents]} {incr i;incr k} {
       #    if {$j==-1} {
-      #      set j [lsearch $talents_list "$fave_talent($i)"]
+      #      set j [lsearch $talents_list "$fave_talents($i)"]
       #    } else {
       #      if {$i==$k} {incr k -1}
-      #      set fave_talent($k) $fave_talent($i)
+      #      set fave_talents($k) $fave_talents($i)
       #    }
       #  }
       #  # FAVE TALENT FOUND?
       #  if {$j!=-1} {
-      #    array unset fave_talent [expr [array size fave_talent] - 1]
-      #    send_user "MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / [array size fave_talent] / talents-on-1-page: $talents_on_one_page\n"
+      #    array unset fave_talents [expr [array size fave_talents] - 1]
+      #    send_user "MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / [array size fave_talents] / talents-on-1-page: $talents_on_one_page\n"
       #  }
       #  if {$j!=-1} {
       #    #set talent($talents_selected) "[lindex $talents_list $j]"
@@ -732,51 +728,43 @@ while {1} {
 
   for {set talent_count 0} {$talent_count<$talents} {incr talent_count} {
     # find the desired talent from talents_list
-    for {set i 0;set j -1;set k 0} {$i<[array size fave_talent]} {incr i;incr k} {
+    for {set i 0;set j -1;set k 0} {$i<[array size fave_talents]} {incr i;incr k} {
       if {$j==-1} {
-        set j [lsearch $talents_list "$fave_talent($i)"]
+        set j [lsearch $talents_list "$fave_talents($i)"]
       } else {
         if {$i==$k} {incr k -1}
-        set fave_talent($k) $fave_talent($i)
+        set fave_talents($k) $fave_talents($i)
       }
     }
     if {$j!=-1} {
-      #send_user "DEBUG: \[expr \[array size fave_talent] - 1]=[expr [array size fave_talent] - 1]\n"
-      array unset fave_talent [expr [array size fave_talent] - 1]
-      send_user "MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / [array size fave_talent] / talents-on-1-page: $talents_on_one_page\n"
+      #send_user "DEBUG: \[expr \[array size fave_talents] - 1]=[expr [array size fave_talents] - 1]\n"
+      array unset fave_talents [expr [array size fave_talents] - 1]
+      send_user "  MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / fave_talents=[array size fave_talents]\n"
 
-
-
-      send_user "DEBUG: elements in \$talents_list = [llength $talents_list]\n"
-      #send_user "DEBUG: \[lindex \$talents_list \$j]=[lindex $talents_list $j]\n"
-      #send_user "DEBUG: [lindex $talents_list $j]\n"
-      #array unset talents_list [lindex $talents_list $j]
-      #array unset talents_list "Affinity with Axes"
-      #array unset talents_list [lindex $talents_list 0]
-      #send_user "DEBUG: \[lsearch \$talents_list \[lindex \$talents_list \$j]]=[lsearch $talents_list [lindex $talents_list $j]]\n"
-
+      if {$debug} {send_user "DEBUG: elements in \$talents_list = [llength $talents_list]\n"}
       # remove the chosen talent from the offered talents list
       # http://stackoverflow.com/questions/5701947/tcl-remove-an-element-from-a-list
       set idx [lsearch $talents_list [lindex $talents_list $j]]
       set talents_list [lreplace $talents_list $idx $idx]
+      if {$debug} {send_user "DEBUG: elements in \$talents_list = [llength $talents_list]\n"}
 
-      send_user "DEBUG: elements in \$talents_list = [llength $talents_list]\n"
-
+      # first page
       if {$j<24} {
-        send_user "sending \"[lindex $alphabets [expr $j % 22]]\"\n"
+        send_user "  sending \"[lindex $alphabets [expr $j % 22]]\"\n"
         send "[lindex $alphabets [expr $j % 22]]"
-      # TODO: count the page
+      # second page
       } elseif {$j>23&&$j<48} {
-        #expect "\\\[?] Help"
+	expect -re ".*"
         send "+"
-        send_user "sending \"[lindex $alphabets [expr $j % 23]]\"\n"
+        send_user "  sending \"[lindex $alphabets [expr $j % 23]]\"\n"
         send "[lindex $alphabets [expr $j % 23]]"
+      # third page
       } elseif {$j>47} {
-        #expect "\\\[?] Help"
+	expect -re ".*"
         send "+"
-        #expect "\\\[?] Help"
+	expect -re ".*"
         send "+"
-        send_user "sending \"[lindex $alphabets [expr $j % 23]]\"\n"
+        send_user "  sending \"[lindex $alphabets [expr $j % 23]]\"\n"
         send "[lindex $alphabets [expr $j % 23]]"
       }
       #send "[lindex $alphabets [expr $j % $talents_on_one_page]]"
