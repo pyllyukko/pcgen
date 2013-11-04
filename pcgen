@@ -727,34 +727,25 @@ while {1} {
         send_user "DEBUG: j>22 && pages==1\n"
         expect -re ".*"
         send "+"
-        #expect "Choose talent"
 	expect "\\\[?] Help"
         send_user "  sending \"[lindex $alphabets [expr $j - 23]]\"\n"
         send "[lindex $alphabets [expr $j - 23]]"
       } elseif {$j>22&&$j<47} {
         expect -re ".*"
         send "+"
-        #expect "Choose talent"
         expect "\\\[?] Help"
-        #send_user "  sending \"[lindex $alphabets [expr $j % 23]]\"\n"
-        #send "[lindex $alphabets [expr $j % 23]]"
         send_user "  sending \"[lindex $alphabets [expr $j - 23]]\"\n"
         send "[lindex $alphabets [expr $j - 23]]"
-        #expect *
       # third page
       } elseif {$j>46&&$pages==2} {
         send_user "DEBUG: j>46 && pages==2\n"
         expect -re ".*"
         send "+"
-        #expect "Choose talent"
 	expect "\\\[?] Help"
         send "+"
-        #expect "Choose talent"
 	expect "\\\[?] Help"
-        #send_user "  sending \"[lindex $alphabets [expr $j % 47]]\"\n"
         send_user "  sending \"[lindex $alphabets [expr $j - 47]]\"\n"
         send "[lindex $alphabets [expr $j - 47]]"
-	#expect *
       } else {
         send_error "  WARNING: don't know what to do! :)\n"
         send_user "  sending \"a\"\n"
