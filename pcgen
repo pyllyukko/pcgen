@@ -626,7 +626,16 @@ while {1} {
   #   - GOOD LEARNER:	"Not quite good enough for serious consideration."
   #   - CAREFUL:	5
   #     - VERY CAREFUL:	"If, however, you're a spellcaster, or you generally fight at the Very Defensive setting, this can be a useful bonus."
-  array set fave_talents {0 Alert 1 "Good Learner" 2 Healthy 3 Learned 4 Careful 5 Miser 6 "Treasure Hunter" 7 Tough 8 Wealthy}
+  #array set fave_talents {0 Alert 1 "Good Learner" 2 Healthy 3 Learned 4 Careful 5 Miser 6 "Treasure Hunter" 7 Tough 8 Wealthy}
+  #array set fave_talents {0 Alert 1 Miser 2 "Treasure Hunter" 3 "Good Learner" 4 Healthy 5 Learned 6 Careful 7 Tough 8 Wealthy}
+
+
+  # test if the talent system works with last page talents
+  #array set fave_talents {0 Wealthy 1 Tough 2 "Strong Thrower" 3 Learned 4 Porter}
+  array set fave_talents {0 Careful 1 Charming 2 Dextrous 3 Fey-Blooded 4 "Good Learner" 5 Alert 6 Miser 7 "Treasure Hunter" 8 Healthy 9 Learned 10 Tough 11 Wealthy}
+
+  # test if the talent system works with first page talents
+  #array set fave_talents {0 Aggressive 1 Ambidextrous 2 Basher 3 Brawler 4 Alert 5 Miser 6 "Treasure Hunter" 7 "Good Learner" 8 Healthy 9 Learned 10 Careful 11 Tough 12 Wealthy}
   set selected_talents {}
 
   # how this works:
@@ -641,8 +650,6 @@ while {1} {
   for {set talent_count 0;set pages 0} {$talent_count<$talents} {incr talent_count;set pages 0} {
     send_user "\ntalent $talent_count:\n"
     set talents_list {}
-    send_user "DEBUG666: elements in \$talents_list = [llength $talents_list]\n"
-    send_user "DEBUG666: AVAILABLE TALENTS: [llength $talents_list]\n"
     while {1} {
       expect {
         -re "(\[A-Z]) - (\[A-Za-z -]*)" {
@@ -666,18 +673,17 @@ while {1} {
         }
       }
     }
-    send_user "pages: $pages\n"
+    send_user "  pages: $pages\n"
     #send "[lindex $alphabets [expr $j % $talents_on_one_page]]"
     #send "a"
     #send_user "sending \"a\"\n"
-    send_user "out of while loop\n"
 
     #send "a"
     #send_user "  selecting a\n"
     #continue
 
     for {set page 0} {$page<$pages} {incr page} {
-      send_user "rewind page\n"
+      send_user "  rewind page\n"
       #sleep 1
       send -- "-"
       #sleep 1
@@ -705,7 +711,7 @@ while {1} {
       array unset fave_talents [expr [array size fave_talents] - 1]
       send_user "  MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / fave_talents=[array size fave_talents]\n"
 
-      if {$debug} {send_user "DEBUG: elements in \$talents_list = [llength $talents_list]\n"}
+      #if {$debug} {send_user "DEBUG: elements in \$talents_list = [llength $talents_list]\n"}
       ## remove the chosen talent from the offered talents list
       ## http://stackoverflow.com/questions/5701947/tcl-remove-an-element-from-a-list
       #set idx [lsearch $talents_list [lindex $talents_list $j]]
@@ -713,11 +719,19 @@ while {1} {
       #if {$debug} {send_user "DEBUG: elements in \$talents_list = [llength $talents_list]\n"}
 
       # first page
-      if {$j<24} {
-        send_user "  sending \"[lindex $alphabets [expr $j % 22]]\"\n"
-        send "[lindex $alphabets [expr $j % 22]]"
+      if {$j<23} {
+        send_user "  sending \"[lindex $alphabets $j]\"\n"
+        send "[lindex $alphabets $j]"
       # second page
-      } elseif {$j>23&&$j<48} {
+      } elseif {$j>22&&$pages==1} {
+        send_user "DEBUG: j>22 && pages==1\n"
+        expect -re ".*"
+        send "+"
+        #expect "Choose talent"
+	expect "\\\[?] Help"
+        send_user "  sending \"[lindex $alphabets [expr $j - 23]]\"\n"
+        send "[lindex $alphabets [expr $j - 23]]"
+      } elseif {$j>22&&$j<48} {
         expect -re ".*"
         send "+"
         #expect "Choose talent"
@@ -726,7 +740,8 @@ while {1} {
         send "[lindex $alphabets [expr $j % 23]]"
         #expect *
       # third page
-      } elseif {$j>47} {
+      } elseif {$j>46&&$pages==2} {
+        send_user "DEBUG: j>46 && pages==2\n"
         expect -re ".*"
         send "+"
         #expect "Choose talent"
@@ -734,12 +749,19 @@ while {1} {
         send "+"
         #expect "Choose talent"
 	expect "\\\[?] Help"
-        send_user "  sending \"[lindex $alphabets [expr $j % 23]]\"\n"
-        send "[lindex $alphabets [expr $j % 23]]"
+        send_user "  sending \"[lindex $alphabets [expr $j % 47]]\"\n"
+        send "[lindex $alphabets [expr $j - 47]]"
 	#expect *
+      } else {
+        send_error "  WARNING: don't know what to do! :)\n"
+        send_user "  sending \"a\"\n"
+        send "a"
       }
       #send "[lindex $alphabets [expr $j % $talents_on_one_page]]"
       #send_user "sending \"[lindex $alphabets [expr $j % $talents_on_one_page]]\"\n"
+      lappend selected_talents [lindex $talents_list $j]
+    } else {
+      send_error "OUT OF FAVE TALENTS!!!\n"
     }
     #expect -re ".*"
     #unset expect_out
