@@ -138,7 +138,6 @@ proc ask_user {} {
   if {$talents==1} {
     send_user "talent: \033\[1;31m[string tolower [lindex $selected_talents 0]]\033\[0m\n"
   } else {
-    # TODO: FIX!
     send_user "talents: "
     for {set x 0} {$x<[expr $talents - 1]} {incr x} {
       if {$x==[expr $talents - 2]} {
@@ -497,7 +496,6 @@ while {1} {
   }
   # COMPLEXION?!?
   if {$pc(profession)=="*"} {
-    # TODO: this might need tweaking!
     expect {
       -re "You are now a fully.*learned( |\r\u001b\\\[\[0-9]+d)(\[a-z]+)\." {set _profession $expect_out(2,string)}
       "path of a Chaos Knight lay before you"	{set _profession "chaos knight"}
@@ -665,6 +663,7 @@ while {1} {
     set talents_list {}
     while {1} {
       expect {
+        # TODO: store the letter and page of a talent into some array, so we don't need to "calculate" it.
         -re "(\[A-Z]) - (\[A-Za-z -]*)" {
           lappend talents_list "[string trimright $expect_out(2,string)]"
 
