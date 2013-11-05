@@ -101,7 +101,25 @@ proc ask_user {} {
 
   set ret 0
 
-  send_user "you are born in the month of the \033\[1;31m[string tolower $month]\033\[0m\n"
+  # http://www.adomgb.info/adomgb-1-1.html
+  send_user "you are born in the month of the "
+  # good combo
+  if { \
+    ($_profession=="wizard"&&($month=="Cup")) || \
+    (($_profession=="wizard"||$_profession=="mindcrafter")&&($month=="Wolf"||$month=="Tree")) || \
+    ($_race=="gray elf"&&$_profession=="wizard"&&$month=="Wand") ||\
+    (($_profession=="elementalist"||$_profession=="necromancer")&&$month=="Salamander") \
+  } {
+    send_user "\033\[0;32m[string tolower $month]\033\[0m\n"
+  # bad combo
+  } elseif { \
+    ($_profession=="wizard"&&$month=="Book") || \
+    (($_profession=="wizard"||$_profession=="mindcrafter")&&$month=="Dragon") \
+  } {
+    send_user "\033\[0;31m[string tolower $month]\033\[0m\n"
+  } else {
+    send_user "\033\[1;31m[string tolower $month]\033\[0m\n"
+  }
   send_user "sex:\t\t\033\[1;31m${_sex}\033\[0m\n"
   send_user "race:\t\t\033\[1;31m${_race}\033\[0m\n"
   send_user "profession:\t\033\[1;31m${_profession}\033\[0m\n"
@@ -623,11 +641,13 @@ while {1} {
   # desired talents:
   #   - alert is a must!
   #   - QUICK:		8
+  #     - "Speed is hard to come by, and a hefty +9 is probably worth the three talents it costs."
   #   - GOOD LEARNER:	"Not quite good enough for serious consideration."
   #   - CAREFUL:	5
   #     - VERY CAREFUL:	"If, however, you're a spellcaster, or you generally fight at the Very Defensive setting, this can be a useful bonus."
+  #   - POTENT AURA: "This talent is the prerequisite for every single MAGICAL TALENT."
   #array set fave_talents {0 Alert 1 "Good Learner" 2 Healthy 3 Learned 4 Careful 5 Miser 6 "Treasure Hunter" 7 Tough 8 Wealthy}
-  array set fave_talents {0 Alert 1 Miser 2 "Treasure Hunter" 3 "Good Learner" 4 Healthy 5 Learned 6 Careful 7 Tough 8 Wealthy}
+  array set fave_talents {0 Alert 1 Miser 2 "Treasure Hunter" 3 Porter 4 Careful 5 "Good Learner" 6 Healthy 7 Learned 8 Tough 9 Wealthy}
 
 
   # test if the talent system works with last page talents
@@ -646,9 +666,9 @@ while {1} {
   #
 
   # read all the available talents into talents_list
-  send_user "choosing $talents talent(s):\n"
+  if {$debug} { send_user "choosing $talents talent(s):\n" }
   for {set talent_count 0;set pages 0} {$talent_count<$talents} {incr talent_count;set pages 0} {
-    send_user "\ntalent $talent_count:\n"
+    if {$debug} { send_user "\ntalent $talent_count:\n" }
     set talents_list {}
     while {1} {
       expect {
@@ -664,16 +684,16 @@ while {1} {
           expect "\\\[?] Help"
           #sleep 2
           send "+"
-          send_user "  choosing next page\n"
+          if {$debug} { send_user "  choosing next page\n" }
           incr pages
         }
         "\\\[?] Help" {
-          send_user "  AVAILABLE TALENTS: [llength $talents_list]\n"
+          if {$debug} { send_user "  AVAILABLE TALENTS: [llength $talents_list]\n" }
           break
         }
       }
     }
-    send_user "  pages: $pages\n"
+    if {$debug} { send_user "  pages: $pages\n" }
     #send "[lindex $alphabets [expr $j % $talents_on_one_page]]"
     #send "a"
     #send_user "sending \"a\"\n"
@@ -683,7 +703,7 @@ while {1} {
     #continue
 
     for {set page 0} {$page<$pages} {incr page} {
-      send_user "  rewind page\n"
+      if {$debug} { send_user "  rewind page\n" }
       #sleep 1
       send -- "-"
       #sleep 1
@@ -709,7 +729,7 @@ while {1} {
     if {$j!=-1} {
       #send_user "DEBUG: \[expr \[array size fave_talents] - 1]=[expr [array size fave_talents] - 1]\n"
       array unset fave_talents [expr [array size fave_talents] - 1]
-      send_user "  MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / fave_talents=[array size fave_talents]\n"
+      if {$debug} { send_user "  MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / fave_talents=[array size fave_talents]\n" }
 
       #if {$debug} {send_user "DEBUG: elements in \$talents_list = [llength $talents_list]\n"}
       ## remove the chosen talent from the offered talents list
@@ -720,31 +740,31 @@ while {1} {
 
       # first page
       if {$j<23} {
-        send_user "  sending \"[lindex $alphabets $j]\"\n"
+        if {$debug} { send_user "  sending \"[lindex $alphabets $j]\"\n" }
         send "[lindex $alphabets $j]"
       # second page
       } elseif {$j>22&&$pages==1} {
-        send_user "DEBUG: j>22 && pages==1\n"
+        if {$debug} { send_user "DEBUG: j>22 && pages==1\n" }
         expect -re ".*"
         send "+"
 	expect "\\\[?] Help"
-        send_user "  sending \"[lindex $alphabets [expr $j - 23]]\"\n"
+        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - 23]]\"\n" }
         send "[lindex $alphabets [expr $j - 23]]"
       } elseif {$j>22&&$j<47} {
         expect -re ".*"
         send "+"
         expect "\\\[?] Help"
-        send_user "  sending \"[lindex $alphabets [expr $j - 23]]\"\n"
+        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - 23]]\"\n" }
         send "[lindex $alphabets [expr $j - 23]]"
       # third page
       } elseif {$j>46&&$pages==2} {
-        send_user "DEBUG: j>46 && pages==2\n"
+        if {$debug} { send_user "DEBUG: j>46 && pages==2\n" }
         expect -re ".*"
         send "+"
 	expect "\\\[?] Help"
         send "+"
 	expect "\\\[?] Help"
-        send_user "  sending \"[lindex $alphabets [expr $j - 47]]\"\n"
+        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - 47]]\"\n" }
         send "[lindex $alphabets [expr $j - 47]]"
       } else {
         send_error "  WARNING: don't know what to do! :)\n"
