@@ -436,21 +436,20 @@ while {1} {
     set pid [exp_pid]
 
     # prerelease notice
-    expect "PRESS ENTER TO CONTINUE]"
-    send "\r"
+    expect -re ".*"
+    send "p"
+
+    expect -re "(.)' to continue. ===---"
+    send "$expect_out(1,string)"
 
     expect {
-      #"/* \r\n * ADOM session aborted due to an external problem. \r\n * Problem Description: ADOM is either already running or the file\r\n                        '/home/pyllyukko/.adom.data/.adom.prc' was not\r\n                        removed. \r\n                        Unable to start. \r\n */ \r\n\r\n\r\n[Press ENTER to continue]" {}
+      "Your choice: " {}
+      "Press SPACE to continue]" {send " ";expect "Press SPACE to continue]";send " "}
       " \\* ADOM session aborted due to an external problem." {
         if {!$log_user} {send_error "error! - change \$log_user to 1 to see what went wrong"}
         expect "Press ENTER to continue]";send "\r";send_user "\n"
         exit 1
       }
-      "Press SPACE to continue]" {send " "}
-    }
-    expect {
-      "Your choice: " {}
-      "Press SPACE to continue]" {send " ";expect "Press SPACE to continue]";send " "}
     }
     send "g"
     expect -re "You are born in the month of the (.*) on day "
