@@ -435,10 +435,11 @@ while {1} {
     spawn $adom -m
     set pid [exp_pid]
 
-    # prerelease notice
     expect -re ".*"
+    # Play the Game
     send "p"
 
+    # ADOM @ Steam note
     expect -re "(.)' to continue. ===---"
     send "$expect_out(1,string)"
 
