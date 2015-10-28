@@ -258,7 +258,7 @@ proc answer_question {numero} {
 # make sure we have new enough version of expect
 exp_version -exit 5.41
 
-if {!$log_user} {send_user "pcgen - by pyllyukko - 2002-2013\n\n"}
+if {!$log_user} {send_user "pcgen - by pyllyukko - 2002-2015\n\n"}
 if {![file executable $adom]} {send_error "error: \`$adom' not executable!\n";exit 1}
 if {![regexp "^\[a-j*]$" $pc(race)]} {
   send_error "error: invalid race \"$race\"!\n"
