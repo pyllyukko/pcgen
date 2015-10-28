@@ -1,10 +1,10 @@
 #!/usr/bin/expect --
 ################################################################################
 #
-# pcgen for adom - by pyllyukko - 2002-2013
-# send all suggestions, typo & bug reports, criticism & everything else to
-# pyllyukko <at> maimed <d0t> org
-# (before you mail anything please notice that this script is on beta stage)
+# pcgen for adom - by pyllyukko - 2002-2015
+#
+# https://github.com/pyllyukko/pcgen
+#
 ################################################################################
 # set these variables below as desired. pcgen will deside what to answer to the
 # opening questions based on these values. pcgen will try to get you more
