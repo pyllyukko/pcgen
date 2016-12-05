@@ -1,4 +1,5 @@
 #!/bin/sh
+CWD=$( realpath $( dirname "${0}" ) )
 #LETTERS=(A B C D E F G H I J K L M N O P Q R S T)
 LETTERS=(a b c d e f g h i j k l m n o p q r s t)
 SKILLS=(st le wi dx to ch ap ma pe)
@@ -7,8 +8,8 @@ PROFFS=(Fighter Paladin Ranger Thief Assassin Wizard Priest Bard Monk Healer Wea
 for ((I=0; I<=19; I++))
 do
   #echo -n "${PROFFS[${I}]}: "
-  TOTAL=`grep "${PROFFS[${I}]}" /home/pyllyukko/projektit/pcgen/helpers/class_attributes.txt | sed 's/^.*\([+-] *[0-9]*\)$/\1/;s/ //g'`  
-  LINE=`grep "${PROFFS[${I}]}" /home/pyllyukko/projektit/pcgen/helpers/class_attributes.txt | sed 's/^[^0-9+-]*//'`
+  TOTAL=`grep "${PROFFS[${I}]}" ${CWD}/class_attributes.txt | sed 's/^.*\([+-] *[0-9]*\)$/\1/;s/ //g'`
+  LINE=`grep "${PROFFS[${I}]}" ${CWD}/class_attributes.txt | sed 's/^[^0-9+-]*//'`
   ST=`echo "${LINE}" | awk '{print $1}'`
   LE=`echo "${LINE}" | awk '{print $2}'`
   WI=`echo "${LINE}" | awk '{print $3}'`
@@ -33,8 +34,8 @@ exit 0
 for ((I=0; I<=$[${#RACES[*]}-1]; I++))
 do
   #echo "${I}: ${LETTERS[${I}]} ${RACES[${I}]}"
-  TOTAL=`grep "${RACES[${I}]}" /home/pyllyukko/projektit/pcgen/helpers/race_attributes.txt | sed 's/^.*\([+-] *[0-9]*\)$/\1/;s/ //g'`
-  LINE=`grep "${RACES[${I}]}" /home/pyllyukko/projektit/pcgen/helpers/race_attributes.txt | sed 's/^[^0-9]*//'`
+  TOTAL=`grep "${RACES[${I}]}" ${CWD}/race_attributes.txt | sed 's/^.*\([+-] *[0-9]*\)$/\1/;s/ //g'`
+  LINE=`grep "${RACES[${I}]}" ${CWD}/race_attributes.txt | sed 's/^[^0-9]*//'`
   ST=`echo "${LINE}" | awk '{print $1}'`
   LE=`echo "${LINE}" | awk '{print $2}'`
   WI=`echo "${LINE}" | awk '{print $3}'`
@@ -67,7 +68,7 @@ echo
 exit 0
 for ((I=0; I<=19; I++))
 do
-  TOTAL=`grep "${PROFFS[${I}]}" /home/pyllyukko/projektit/pcgen/helpers/class_attributes.txt | sed 's/^.*\([+-] *[0-9]*\)$/\1/;s/ //g'`  
+  TOTAL=`grep "${PROFFS[${I}]}" ${CWD}/class_attributes.txt | sed 's/^.*\([+-] *[0-9]*\)$/\1/;s/ //g'`
   #echo -n "${PROFFS[${I}]} "
   [ "x${TOTAL:0:1}" = "x+" ] && {
     echo -n "${LETTERS[${I}]} ${TOTAL#+} "
