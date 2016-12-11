@@ -435,7 +435,14 @@ while {1} {
     spawn $adom -m
     set pid [exp_pid]
 
-    expect -re ".*"
+    expect {
+      " \\* ADOM session aborted due to an external problem." {
+        if {!$log_user} {send_error "error! - change \$log_user to 1 to see what went wrong"}
+        expect "Press ENTER to continue]";send "\r";send_user "\n"
+        exit 1
+      }
+      "lay the Game" {}
+    }
     # Play the Game
     send "p"
 
