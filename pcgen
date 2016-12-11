@@ -666,7 +666,7 @@ while {1} {
 
   # read all the available talents into talents_list
   if {$debug} { send_user "choosing $talents talent(s):\n" }
-  for {set talent_count 0;set pages 0} {$talent_count<$talents} {incr talent_count;set pages 0} {
+  for {set talent_count 0;set pages 0;set talents_on_one_page 0} {$talent_count<$talents} {incr talent_count;set pages 0} {
     if {$debug} { send_user "\ntalent $talent_count:\n" }
     set talents_list {}
     while {1} {
@@ -683,6 +683,10 @@ while {1} {
           send "+"
           if {$debug} { send_user "  choosing next page\n" }
           incr pages
+          if {$talents_on_one_page==0} {
+            set talents_on_one_page [llength $talents_list]
+          }
+          if {$debug} { send_user "  talents on one page: $talents_on_one_page\n" }
         }
         "\\\[?] Help" {
           if {$debug} { send_user "  AVAILABLE TALENTS: [llength $talents_list]\n" }
@@ -712,33 +716,33 @@ while {1} {
       if {$debug} { send_user "  MATCH: $j: \033\[1;31m[lindex $talents_list $j]\033\[0m / fave_talents=[array size fave_talents]\n" }
 
       # first page
-      if {$j<23} {
+      if {$j<$talents_on_one_page} {
         if {$debug} { send_user "  sending \"[lindex $alphabets $j]\"\n" }
         send "[lindex $alphabets $j]"
       # second page
-      } elseif {$j>22&&$pages==1} {
-        if {$debug} { send_user "DEBUG: j>22 && pages==1\n" }
+      } elseif {$j>$talents_on_one_page-1&&$pages==1} {
+        if {$debug} { send_user "DEBUG: j>[expr $talents_on_one_page - 1] && pages==1\n" }
         expect -re ".*"
         send "+"
 	expect "\\\[?] Help"
-        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - 23]]\"\n" }
-        send "[lindex $alphabets [expr $j - 23]]"
-      } elseif {$j>22&&$j<47} {
+        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - $talents_on_one_page]]\"\n" }
+        send "[lindex $alphabets [expr $j - $talents_on_one_page]]"
+      } elseif {$j>$talents_on_one_page-1&&$j<$talents_on_one_page*2+1} {
         expect -re ".*"
         send "+"
         expect "\\\[?] Help"
-        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - 23]]\"\n" }
-        send "[lindex $alphabets [expr $j - 23]]"
+        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - $talents_on_one_page]]\"\n" }
+        send "[lindex $alphabets [expr $j - $talents_on_one_page]]"
       # third page
-      } elseif {$j>46&&$pages==2} {
-        if {$debug} { send_user "DEBUG: j>46 && pages==2\n" }
+      } elseif {$j>$talents_on_one_page*2&&$pages==2} {
+        if {$debug} { send_user "DEBUG: j>[expr $talents_on_one_page * 2] && pages==2\n" }
         expect -re ".*"
         send "+"
 	expect "\\\[?] Help"
         send "+"
 	expect "\\\[?] Help"
-        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - 47]]\"\n" }
-        send "[lindex $alphabets [expr $j - 47]]"
+        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - ($talents_on_one_page*2+1)]]\"\n" }
+        send "[lindex $alphabets [expr $j - ($talents_on_one_page*2+1)]]"
       } else {
         send_error "  WARNING: don't know what to do! :)\n"
         send_user "  sending \"a\"\n"
