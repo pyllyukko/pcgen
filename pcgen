@@ -678,7 +678,7 @@ while {1} {
           # this will print the list of offered talents
           if {$debug} {send_user "  $expect_out(1,string) - [expr [llength $talents_list] - 1] - $expect_out(2,string)\n"}
         }
-        -re "\[^-]\r\u001b\\\[\[0-9]*d\\(more\\)\u001b.*Choose talent" {
+        -re "\[^-]\r\u001b\\\[\[0-9]*d\\(more\\).*\u001b.*Choose talent" {
           expect "\\\[?] Help"
           send "+"
           if {$debug} { send_user "  choosing next page\n" }
