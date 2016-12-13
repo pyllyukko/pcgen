@@ -730,10 +730,9 @@ while {1} {
             -re "(\[A-Z]) - (\[A-Za-z -]*)" {
               # it's still easier to do string matching than calculating the position
               if {[string trimright $expect_out(2,string)]==[lindex $talents_list $j]} {
-                send_user "THIS!\n"
                 set letter $expect_out(1,string)
               }
-              send_user "  $talents_seen - $expect_out(1,string) - [string trimright $expect_out(2,string)]\n"
+              #send_user "  $talents_seen - $expect_out(1,string) - [string trimright $expect_out(2,string)]\n"
               incr talents_seen
             }
             -re "\[^-]\r\u001b\\\[\[0-9]*d\\(more\\).*\u001b.*Choose talent" {
