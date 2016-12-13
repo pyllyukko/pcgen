@@ -722,7 +722,6 @@ while {1} {
       # rest of the pages
       } else {
         set talents_seen $talents_on_one_page
-        set talents_index 0
         send "+"
         set letter ""
         while {1} {
