@@ -719,34 +719,40 @@ while {1} {
       if {$j<$talents_on_one_page} {
         if {$debug} { send_user "  sending \"[lindex $alphabets $j]\"\n" }
         send "[lindex $alphabets $j]"
-      # second page
-      } elseif {$j>$talents_on_one_page-1&&$pages==1} {
-        if {$debug} { send_user "DEBUG: j>[expr $talents_on_one_page - 1] && pages==1\n" }
-        expect -re ".*"
-        send "+"
-	expect "\\\[?] Help"
-        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - $talents_on_one_page]]\"\n" }
-        send "[lindex $alphabets [expr $j - $talents_on_one_page]]"
-      } elseif {$j>$talents_on_one_page-1&&$j<$talents_on_one_page*2+1} {
-        expect -re ".*"
-        send "+"
-        expect "\\\[?] Help"
-        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - $talents_on_one_page]]\"\n" }
-        send "[lindex $alphabets [expr $j - $talents_on_one_page]]"
-      # third page
-      } elseif {$j>$talents_on_one_page*2&&$pages==2} {
-        if {$debug} { send_user "DEBUG: j>[expr $talents_on_one_page * 2] && pages==2\n" }
-        expect -re ".*"
-        send "+"
-	expect "\\\[?] Help"
-        send "+"
-	expect "\\\[?] Help"
-        if {$debug} { send_user "  sending \"[lindex $alphabets [expr $j - ($talents_on_one_page*2+1)]]\"\n" }
-        send "[lindex $alphabets [expr $j - ($talents_on_one_page*2+1)]]"
+      # rest of the pages
       } else {
-        send_error "  WARNING: don't know what to do! :)\n"
-        send_user "  sending \"a\"\n"
-        send "a"
+        set talents_seen $talents_on_one_page
+        set talents_index 0
+        send "+"
+        set letter ""
+        while {1} {
+          expect {
+            -re "(\[A-Z]) - (\[A-Za-z -]*)" {
+              # it's still easier to do string matching than calculating the position
+              if {[string trimright $expect_out(2,string)]==[lindex $talents_list $j]} {
+                send_user "THIS!\n"
+                set letter $expect_out(1,string)
+              }
+              send_user "  $talents_seen - $expect_out(1,string) - [string trimright $expect_out(2,string)]\n"
+              incr talents_seen
+            }
+            -re "\[^-]\r\u001b\\\[\[0-9]*d\\(more\\).*\u001b.*Choose talent" {
+              expect "\\\[?] Help"
+              # no need to go through any more pages
+              if {$j<$talents_seen} {
+                break
+              }
+              send "+"
+              if {$debug} { send_user "  choosing next page\n" }
+            }
+            "\\\[?] Help" {
+              if {$debug} { send_user "  end of page\n" }
+              break
+            }
+          }
+        }
+        if {$debug} { send_user "  sending \"$letter\"\n" }
+        send "$letter"
       }
       lappend selected_talents [lindex $talents_list $j]
     } else {
